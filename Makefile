@@ -107,7 +107,7 @@ AREA_PLOT_TOP 		?=# top level module to consider for the area plot (automaticall
 # Remote upload to PYNQ
 FUSESOC_BUILD_NAME 	:= $(notdir $(FUSESOC_BUILD_DIR))
 BD_NAME				:= xilinx_core_v_mini_mcu
-BITSTREAM_SOURCE   	:= $(FUSESOC_BUILD_DIR)/$(FPGA_BOARD)-vivado/$(FUSESOC_BUILD_NAME).runs/impl_1/$(BD_NAME).bit
+BITSTREAM_SOURCE   	:= $(FUSESOC_BUILD_DIR)/$(FPGA_BOARD)-vivado/$(FUSESOC_BUILD_NAME).runs/impl_1/$(BD_NAME)_wrapper.bit
 HWH_SOURCE 			:= $(FUSESOC_BUILD_DIR)/$(FPGA_BOARD)-vivado/$(FUSESOC_BUILD_NAME).gen/sources_1/bd/xilinx_ps_wizzard/hw_handoff/xilinx_ps_wizzard.hwh 
 
 # Export variables to sub-makefiles
@@ -298,9 +298,6 @@ vivado-fpga-pgm:
 ## @param REMOTE=user@host
 ## @param REMOTE_DIR=/remote/dir
 vivado-fpga-remote-pgm:
-	@echo "FUSESOC_BUILD_DIR  = '$(FUSESOC_BUILD_DIR)'"
-	@echo "BITSTREAM_SOURCE   = '$(BITSTREAM_SOURCE)'"
-	@test -f "$(BITSTREAM_SOURCE)" || (echo "ERROR: missing file: $(BITSTREAM_SOURCE)"; exit 1)
 	scp $(BITSTREAM_SOURCE) $(REMOTE):$(REMOTE_DIR)/
 	scp $(HWH_SOURCE) $(REMOTE):$(REMOTE_DIR)/$(BD_NAME)_wrapper.hwh
 

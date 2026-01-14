@@ -104,6 +104,12 @@ AREA_PLOT_RPT 		?= $(word 1, $(shell [ -d $(BUILD_DIR) ] && find $(BUILD_DIR) -t
 AREA_PLOT_OUTDIR 	?= $(BUILD_DIR)/area-plot/ # output directory for the area plot
 AREA_PLOT_TOP 		?=# top level module to consider for the area plot (automatically infer)
 
+# Remote upload to PYNQ
+FUSESOC_BUILD_NAME 	:= $(notdir $(FUSESOC_BUILD_DIR))
+BD_NAME				:= xilinx_core_v_mini_mcu
+BITSTREAM_SOURCE   	:= $(FUSESOC_BUILD_DIR)/$(FPGA_BOARD)-vivado/$(FUSESOC_BUILD_NAME).runs/impl_1/$(BD_NAME).bit
+HWH_SOURCE 			:= $(FUSESOC_BUILD_DIR)/$(FPGA_BOARD)-vivado/$(FUSESOC_BUILD_NAME).gen/sources_1/bd/xilinx_ps_wizzard/hw_handoff/xilinx_ps_wizzard.hwh 
+
 # Export variables to sub-makefiles
 export
 
@@ -286,6 +292,17 @@ vivado-fpga-nobuild:
 ## @param FPGA_BOARD=nexys-a7-100t,pynq-z2,zcu104,zcu102
 vivado-fpga-pgm:
 	$(FUSESOC) --cores-root . run --no-export --target=$(FPGA_BOARD) $(FUSESOC_FLAGS) --run openhwgroup.org:systems:core-v-mini-mcu $(FUSESOC_PARAM) 2>&1 | tee programfpga.log
+
+## Loads the generated bitstream into the remote FPGA 
+## @param FPGA_BOARD=pynq-z2
+## @param REMOTE=user@host
+## @param REMOTE_DIR=/remote/dir
+vivado-fpga-remote-pgm:
+	@echo "FUSESOC_BUILD_DIR  = '$(FUSESOC_BUILD_DIR)'"
+	@echo "BITSTREAM_SOURCE   = '$(BITSTREAM_SOURCE)'"
+	@test -f "$(BITSTREAM_SOURCE)" || (echo "ERROR: missing file: $(BITSTREAM_SOURCE)"; exit 1)
+	scp $(BITSTREAM_SOURCE) $(REMOTE):$(REMOTE_DIR)/
+	scp $(HWH_SOURCE) $(REMOTE):$(REMOTE_DIR)/$(BD_NAME)_wrapper.hwh
 
 ## @section ASIC
 ## Note that for this step you need to provide technology-dependent files (e.g., libs, constraints)

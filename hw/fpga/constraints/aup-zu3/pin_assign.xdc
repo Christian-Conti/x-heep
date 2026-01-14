@@ -32,8 +32,8 @@ set_property PACKAGE_PIN AF8 [get_ports {clk_led_o}]
 set_property PACKAGE_PIN AG6 [get_ports {exit_valid_o}]
 
 #  LED EXIT_VALUE
-# set_property PACKAGE_PIN AF6 [get_ports {exit_value_o}]
-set_property PACKAGE_PIN AH6 [get_ports {PL_LEDRGB3[1]}]
+# set_property PACKAGE_PIN AF6 [get_ports {PL_LEDRGB3[0]}]
+set_property PACKAGE_PIN AH6 [get_ports {exit_value_o}]
 # set_property PACKAGE_PIN AG5 [get_ports {PL_LEDRGB3[2]}]
 
 # LED BUFFERS

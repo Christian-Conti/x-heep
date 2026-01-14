@@ -204,6 +204,12 @@ parameters:
     description: |
       Enables RV32Zfinx RISC-V extensions. Admitted values: 1|0.
     default: 0
+  QUADRILATERO:
+    datatype: int
+    paramtype: vlogparam
+    description: |
+      Enables Matrix custom RISC-V extensions. Admitted values: 1|0.
+    default: 0
   JTAG_DPI:
     datatype: int
     paramtype: vlogparam
@@ -261,6 +267,10 @@ parameters:
     paramtype: vlogdefine
     default: false
   FPGA_AUP_ZU3:
+    datatype: bool
+    paramtype: vlogdefine
+    default: false
+  FPGA_GENESYS2:
     datatype: bool
     paramtype: vlogdefine
     default: false
@@ -349,6 +359,7 @@ targets:
     - COREV_PULP
     - FPU
     - ZFINX
+    - QUADRILATERO
     - JTAG_DPI
     - X_EXT
     - USE_EXTERNAL_DEVICE_EXAMPLE
@@ -514,7 +525,7 @@ targets:
         board_part: xilinx.com:zcu104:part0:1.0
         board_repo_paths: [../../../hw/fpga/board_files/vendor/esl_epfl_zcu104_board_files]
     toplevel: [xilinx_core_v_mini_mcu_wrapper]
-    
+
   zcu102:
     <<: *default_target
     default_tool: vivado
@@ -525,6 +536,7 @@ targets:
     parameters:
     - COREV_PULP
     - FPU
+    - ZFINX
     - X_EXT
     - SYNTHESIS=true
     - REMOVE_OBI_FIFO
@@ -536,7 +548,6 @@ targets:
         board_part: xilinx.com:zcu102:part0:3.3
         board_repo_paths: [../../../hw/fpga/board_files/vendor/zcu102]
     toplevel: [xilinx_core_v_mini_mcu_wrapper]
-    
   aup-zu3:
     <<: *default_target
     default_tool: vivado
@@ -559,7 +570,30 @@ targets:
         board_part: realdigital.org:aup-zu3-8gb:part0:1.0
         board_repo_paths: [../../../hw/fpga/board_files/vendor/aup-zu3-8gb/1.0]
     toplevel: [xilinx_core_v_mini_mcu_wrapper]
-    
+
+  genesys2:
+    <<: *default_target
+    default_tool: vivado
+    description: Genesys2 Evaluation Board
+    filesets_append:
+    - x_heep_system
+    - rtl-fpga
+    parameters:
+    - COREV_PULP
+    - FPU
+    - ZFINX
+    - X_EXT
+    - SYNTHESIS=true
+    - REMOVE_OBI_FIFO
+    - FPGA_SYNTHESIS=true
+    - FPGA_GENESYS2=true
+    tools:
+      vivado:
+        part: xc7k325tffg900-2
+        board_part: digilentinc.com:genesys2:part0:1.1
+        board_repo_paths: [../../../hw/fpga/board_files/vendor/genesys2]
+    toplevel: [xilinx_core_v_mini_mcu_wrapper]
+
   asic_synthesis:
     <<: *default_target
     default_tool: design_compiler

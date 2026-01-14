@@ -486,8 +486,6 @@ targets:
         part: xc7z020clg400-1
         board_part: tul.com.tw:pynq-z2:part0:1.0
         board_repo_paths: [../../../hw/fpga/board_files/vendor/esl_epfl_pynq_z2_board_files]
-        vlog_options:
-          - "ps ? (+define+WITH_PS)"
     toplevel: [xilinx_core_v_mini_mcu_wrapper]
 
   zcu104:

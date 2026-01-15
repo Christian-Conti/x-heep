@@ -144,6 +144,10 @@ cmake -S llvm -B build -G "Ninja" -DLLVM_ENABLE_PROJECTS="clang;lld" -DCMAKE_BUI
 cmake --build build --target install # or ninja -C build install
 ```
 
+By default, when compiling an application with Clang, X-HEEP will link with the LLD linker.
+If you want to use the GCC linker, you will need to pass to the `make app` target the
+`CLANG_LINKER_USE_LD=1` option.
+
 ### 4. Install Verilator:
 
 X-HEEP supports Verilator version 5.040, which requires the [following packages](https://verilator.org/guide/latest/install.html) to be installed (Check [OS requirements](#1-os-requirements) for Ubuntu distribution). The [documentation](https://verilator.org/guide/latest/install.html) page contains instructions for other linux distributions. 

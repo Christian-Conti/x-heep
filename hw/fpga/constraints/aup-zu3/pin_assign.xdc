@@ -17,12 +17,12 @@ set_property PACKAGE_PIN AH2 [get_ports {gpio_io[13]}]
 ## RGB LEDS (12 outputs)
 
 # LED RESET
-# set_property PACKAGE_PIN AD7 [get_ports {rst_led_o}]
+# set_property PACKAGE_PIN AD7 [get_ports {PL_LEDRGB0[0]}]
 # set_property PACKAGE_PIN AD9 [get_ports {PL_LEDRGB0[1]}]
 set_property PACKAGE_PIN AE9 [get_ports {rst_led_o}]
 
 # LED CLOCK
-# set_property PACKAGE_PIN AG9 [get_ports {clk_led_o}]
+# set_property PACKAGE_PIN AG9 [get_ports {PL_LEDRGB[0]}]
 # set_property PACKAGE_PIN AE8 [get_ports {PL_LEDRGB1[1]}]
 set_property PACKAGE_PIN AF8 [get_ports {clk_led_o}]
 

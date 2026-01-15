@@ -33,7 +33,7 @@ filesets:
   ip-fpga-pynq-z2:
     files:
     - scripts/pynq-z2/xilinx_generate_clk_wizard.tcl
-    - "ps ? (scripts/pynq-z2/xilinx_generate_ps_wizard.tcl)"
+    - "PS_ENABLE ? (scripts/pynq-z2/xilinx_generate_ps_wizard.tcl)"
     file_type: tclSource
 
   ip-fpga-nexys:
@@ -54,7 +54,7 @@ filesets:
   ip-fpga-aup-zu3:
     files:
     - scripts/aup-zu3/xilinx_generate_clk_wizard.tcl
-    - "ps ? (scripts/aup-zu3/xilinx_generate_ps_wizard.tcl)"
+    - "PS_ENABLE ? (scripts/aup-zu3/xilinx_generate_ps_wizard.tcl)"
     file_type: tclSource
   
   ip-fpga-genesys2:
@@ -122,12 +122,6 @@ parameters:
     default: false
     paramtype: vlogdefine
 
-parameters:
-  PS_ENABLE:
-    datatype: bool
-    default: false
-    paramtype: vlogdefine
-
 targets:
   default: &default_target
     filesets:
@@ -147,4 +141,4 @@ targets:
     - target_genesys2 ? (xdc-fpga-genesys2)
 
     parameters:
-      - "ps ? (PS_ENABLE=true)"
+      - "PS_ENABLE ? (PS_ENABLE=true)"

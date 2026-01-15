@@ -548,7 +548,7 @@ targets:
         board_part: xilinx.com:zcu102:part0:3.3
         board_repo_paths: [../../../hw/fpga/board_files/vendor/zcu102]
     toplevel: [xilinx_core_v_mini_mcu_wrapper]
-    
+
   aup-zu3:
     <<: *default_target
     default_tool: vivado

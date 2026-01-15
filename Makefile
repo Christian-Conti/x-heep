@@ -151,7 +151,7 @@ AREA_PLOT_TOP 		?=# top level module to consider for the area plot (automaticall
 FUSESOC_BUILD_NAME 	:= $(notdir $(FUSESOC_BUILD_DIR))
 BD_NAME				:= xilinx_core_v_mini_mcu
 BITSTREAM_SOURCE   	:= $(FUSESOC_BUILD_DIR)/$(FPGA_BOARD)-vivado/$(FUSESOC_BUILD_NAME).runs/impl_1/$(BD_NAME)_wrapper.bit
-HWH_SOURCE 			:= $(FUSESOC_BUILD_DIR)/$(FPGA_BOARD)-vivado/$(FUSESOC_BUILD_NAME).gen/sources_1/bd/xilinx_ps_wizzard/hw_handoff/xilinx_ps_wizzard.hwh 
+HWH_SOURCE 			:= $(FUSESOC_BUILD_DIR)/$(FPGA_BOARD)-vivado/$(FUSESOC_BUILD_NAME).gen/sources_1/bd/xilinx_ps_wizard/hw_handoff/xilinx_ps_wizard.hwh 
 
 # Export variables to sub-makefiles
 export
@@ -306,7 +306,7 @@ vivado-fpga-pgm:
 	$(FUSESOC) --cores-root . run --no-export --target=$(FPGA_BOARD) $(FUSESOC_FLAGS) --run openhwgroup.org:systems:core-v-mini-mcu $(FUSESOC_PARAM) 2>&1 | tee programfpga.log
 
 ## Loads the generated bitstream into the remote FPGA 
-## @param FPGA_BOARD=pynq-z2
+## @param FPGA_BOARD=pynq-z2,aup-zu3
 ## @param REMOTE=user@host
 ## @param REMOTE_DIR=/remote/dir
 vivado-fpga-remote-pgm:

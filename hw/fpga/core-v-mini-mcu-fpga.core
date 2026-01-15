@@ -54,6 +54,7 @@ filesets:
   ip-fpga-aup-zu3:
     files:
     - scripts/aup-zu3/xilinx_generate_clk_wizard.tcl
+    - "ps ? (scripts/aup-zu3/xilinx_generate_ps_wizard.tcl)"
     file_type: tclSource
   
   ip-fpga-genesys2:

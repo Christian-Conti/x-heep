@@ -1,7 +1,7 @@
 set_property BOARD_PART tul.com.tw:pynq-z2:part0:1.0 [current_project]
 
 # Block design
-set design_name xilinx_ps_wizzard
+set design_name xilinx_ps_wizard
 create_bd_design $design_name
 
 # Create external PS interfaces (DDR / FIXED_IO)
@@ -18,7 +18,7 @@ set_property -dict [list \
     CONFIG.PCW_ACT_DCI_PERIPHERAL_FREQMHZ {10.096154} \
     CONFIG.PCW_ACT_ENET0_PERIPHERAL_FREQMHZ {125.000000} \
     CONFIG.PCW_ACT_ENET1_PERIPHERAL_FREQMHZ {10.000000} \
-    CONFIG.PCW_ACT_FPGA0_PERIPHERAL_FREQMHZ {100.000000} \
+    CONFIG.PCW_ACT_FPGA0_PERIPHERAL_FREQMHZ {10.000000} \
     CONFIG.PCW_ACT_FPGA1_PERIPHERAL_FREQMHZ {10.000000} \
     CONFIG.PCW_ACT_FPGA2_PERIPHERAL_FREQMHZ {10.000000} \
     CONFIG.PCW_ACT_FPGA3_PERIPHERAL_FREQMHZ {10.000000} \
@@ -46,7 +46,7 @@ set_property -dict [list \
     CONFIG.PCW_CAN1_PERIPHERAL_CLKSRC {External} \
     CONFIG.PCW_CAN_PERIPHERAL_CLKSRC {IO PLL} \
     CONFIG.PCW_CAN_PERIPHERAL_VALID {0} \
-    CONFIG.PCW_CLK0_FREQ {100000000} \
+    CONFIG.PCW_CLK0_FREQ {10000000} \
     CONFIG.PCW_CLK1_FREQ {10000000} \
     CONFIG.PCW_CLK2_FREQ {10000000} \
     CONFIG.PCW_CLK3_FREQ {10000000} \
@@ -79,7 +79,7 @@ set_property -dict [list \
     CONFIG.PCW_EN_4K_TIMER {0} \
     CONFIG.PCW_EN_CAN0 {0} \
     CONFIG.PCW_EN_CAN1 {0} \
-    CONFIG.PCW_EN_CLK0_PORT {1} \
+    CONFIG.PCW_EN_CLK0_PORT {0} \
     CONFIG.PCW_EN_CLK1_PORT {0} \
     CONFIG.PCW_EN_CLK2_PORT {0} \
     CONFIG.PCW_EN_CLK3_PORT {0} \
@@ -145,19 +145,17 @@ set_property -dict [list \
     CONFIG.PCW_FCLK1_PERIPHERAL_CLKSRC {IO PLL} \
     CONFIG.PCW_FCLK2_PERIPHERAL_CLKSRC {IO PLL} \
     CONFIG.PCW_FCLK3_PERIPHERAL_CLKSRC {IO PLL} \
-    CONFIG.PCW_FCLK_CLK0_BUF {TRUE} \
     CONFIG.PCW_FPGA0_PERIPHERAL_FREQMHZ {100} \
     CONFIG.PCW_FPGA1_PERIPHERAL_FREQMHZ {50} \
     CONFIG.PCW_FPGA2_PERIPHERAL_FREQMHZ {50} \
     CONFIG.PCW_FPGA3_PERIPHERAL_FREQMHZ {50} \
-    CONFIG.PCW_FPGA_FCLK0_ENABLE {1} \
     CONFIG.PCW_GPIO_BASEADDR {0xE000A000} \
     CONFIG.PCW_GPIO_EMIO_GPIO_ENABLE {0} \
     CONFIG.PCW_GPIO_HIGHADDR {0xE000AFFF} \
     CONFIG.PCW_GPIO_MIO_GPIO_ENABLE {1} \
     CONFIG.PCW_GPIO_MIO_GPIO_IO {MIO} \
     CONFIG.PCW_GPIO_PERIPHERAL_ENABLE {0} \
-    CONFIG.PCW_I2C_RESET_ENABLE {1} \
+    CONFIG.PCW_I2C_RESET_ENABLE {0} \
     CONFIG.PCW_I2C_RESET_POLARITY {Active Low} \
     CONFIG.PCW_IMPORT_BOARD_PRESET {None} \
     CONFIG.PCW_INCLUDE_ACP_TRANS_CHECK {0} \
@@ -318,14 +316,10 @@ set_property -dict [list \
     CONFIG.PCW_MIO_9_SLEW {slow} \
     CONFIG.PCW_MIO_PRIMITIVE {54} \
     CONFIG.PCW_MIO_TREE_PERIPHERALS {GPIO#Quad SPI Flash#Quad SPI Flash#Quad SPI Flash#Quad SPI Flash#Quad SPI Flash#Quad SPI Flash#GPIO#Quad SPI Flash#ENET Reset#GPIO#GPIO#GPIO#GPIO#UART 0#UART 0#Enet\
-0#Enet 0#Enet 0#Enet 0#Enet 0#Enet 0#Enet 0#Enet 0#Enet 0#Enet 0#Enet 0#Enet 0#USB 0#USB 0#USB 0#USB 0#USB 0#USB 0#USB 0#USB 0#USB 0#USB 0#USB 0#USB 0#SD 0#SD 0#SD 0#SD 0#SD 0#SD 0#USB Reset#SD 0#GPIO#GPIO#GPIO#GPIO#Enet\
-0#Enet 0} \
+    0#Enet 0#Enet 0#Enet 0#Enet 0#Enet 0#Enet 0#Enet 0#Enet 0#Enet 0#Enet 0#Enet 0#USB 0#USB 0#USB 0#USB 0#USB 0#USB 0#USB 0#USB 0#USB 0#USB 0#USB 0#USB 0#SD 0#SD 0#SD 0#SD 0#SD 0#SD 0#USB Reset#SD 0#GPIO#GPIO#GPIO#GPIO#Enet\
+    0#Enet 0} \
     CONFIG.PCW_MIO_TREE_SIGNALS {gpio[0]#qspi0_ss_b#qspi0_io[0]#qspi0_io[1]#qspi0_io[2]#qspi0_io[3]/HOLD_B#qspi0_sclk#gpio[7]#qspi_fbclk#reset#gpio[10]#gpio[11]#gpio[12]#gpio[13]#rx#tx#tx_clk#txd[0]#txd[1]#txd[2]#txd[3]#tx_ctl#rx_clk#rxd[0]#rxd[1]#rxd[2]#rxd[3]#rx_ctl#data[4]#dir#stp#nxt#data[0]#data[1]#data[2]#data[3]#clk#data[5]#data[6]#data[7]#clk#cmd#data[0]#data[1]#data[2]#data[3]#reset#cd#gpio[48]#gpio[49]#gpio[50]#gpio[51]#mdc#mdio}\
-\
-    CONFIG.PCW_M_AXI_GP0_ENABLE_STATIC_REMAP {0} \
-    CONFIG.PCW_M_AXI_GP0_ID_WIDTH {12} \
-    CONFIG.PCW_M_AXI_GP0_SUPPORT_NARROW_BURST {0} \
-    CONFIG.PCW_M_AXI_GP0_THREAD_ID_WIDTH {12} \
+    \
     CONFIG.PCW_NAND_CYCLES_T_AR {1} \
     CONFIG.PCW_NAND_CYCLES_T_CLR {1} \
     CONFIG.PCW_NAND_CYCLES_T_RC {11} \
@@ -523,7 +517,7 @@ set_property -dict [list \
     CONFIG.PCW_USE_EXPANDED_IOP {0} \
     CONFIG.PCW_USE_FABRIC_INTERRUPT {0} \
     CONFIG.PCW_USE_HIGH_OCM {0} \
-    CONFIG.PCW_USE_M_AXI_GP0 {1} \
+    CONFIG.PCW_USE_M_AXI_GP0 {0} \
     CONFIG.PCW_USE_M_AXI_GP1 {0} \
     CONFIG.PCW_USE_PROC_EVENT_BUS {0} \
     CONFIG.PCW_USE_PS_SLCR_REGISTERS {0} \
@@ -538,23 +532,16 @@ set_property -dict [list \
     CONFIG.PCW_VALUE_SILVERSION {3} \
     CONFIG.PCW_WDT_PERIPHERAL_CLKSRC {CPU_1X} \
     CONFIG.PCW_WDT_PERIPHERAL_DIVISOR0 {1} \
-  ] $ps7
+] $ps7
 
 # Connect DDR / FIXED_IO
 connect_bd_intf_net [get_bd_intf_ports DDR]      [get_bd_intf_pins $ps7/DDR]
 connect_bd_intf_net [get_bd_intf_ports FIXED_IO] [get_bd_intf_pins $ps7/FIXED_IO]
 
-# Clocking: drive GP0 ACLK from FCLK0
-connect_bd_net [get_bd_pins $ps7/FCLK_CLK0] [get_bd_pins $ps7/M_AXI_GP0_ACLK]
-
-# Validate + save
-validate_bd_design
+# Save and close block design
 save_bd_design
+close_bd_design $design_name
 
-# IMPORTANT: generate BD/IP outputs so HDL + XDC exist
-set bd_file [get_files -norecurse ${design_name}.bd]
-generate_target all $bd_file
-
-# Create wrapper and add it
-set wrapper_path [make_wrapper -files $bd_file -top]
+# create wrapper
+set wrapper_path [ make_wrapper -fileset sources_1 -files [ get_files -norecurse xilinx_ps_wizard.bd ] -top ]
 add_files -norecurse -fileset sources_1 $wrapper_path

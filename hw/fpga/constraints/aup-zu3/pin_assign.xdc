@@ -1,5 +1,5 @@
 # CLOCK
-set_property -dict {PACKAGE_PIN D8 IOSTANDARD DIFF_SSTL12} [get_ports clk_100mhz_p]
+set_property -dict {PACKAGE_PIN D7 IOSTANDARD DIFF_SSTL12} [get_ports clk_100mhz_p]
 set_property -dict {PACKAGE_PIN D6 IOSTANDARD DIFF_SSTL12} [get_ports clk_100mhz_n]
 set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets jtag_tck_i_IBUF]
 
@@ -17,23 +17,23 @@ set_property PACKAGE_PIN AH2 [get_ports {gpio_io[13]}]
 ## RGB LEDS (12 outputs)
 
 # LED RESET
-set_property PACKAGE_PIN AD7 [get_ports {rst_led_o}]
+# set_property PACKAGE_PIN AD7 [get_ports {PL_LEDRGB0[0]}]
 # set_property PACKAGE_PIN AD9 [get_ports {PL_LEDRGB0[1]}]
 set_property PACKAGE_PIN AE9 [get_ports {rst_led_o}]
 
 # LED CLOCK
-set_property PACKAGE_PIN AG9 [get_ports {clk_led_o}]
+# set_property PACKAGE_PIN AG9 [get_ports {PL_LEDRGB[0]}]
 # set_property PACKAGE_PIN AE8 [get_ports {PL_LEDRGB1[1]}]
 set_property PACKAGE_PIN AF8 [get_ports {clk_led_o}]
 
 # LED EXIT_VALID
 # set_property PACKAGE_PIN AF7 [get_ports {PL_LEDRGB2[0]}]
-# set_property PACKAGE_PIN AG8 [get_ports {PL_LEDRGB2[1]}]
-set_property PACKAGE_PIN AG6 [get_ports {exit_valid_o}]
+set_property PACKAGE_PIN AG8 [get_ports {exit_valid_o}]
+# set_property PACKAGE_PIN AG6 [get_ports {PL_LEDRGB2[2]}]
 
 #  LED EXIT_VALUE
-# set_property PACKAGE_PIN AF6 [get_ports {exit_value_o}]
-set_property PACKAGE_PIN AH6 [get_ports {PL_LEDRGB3[1]}]
+set_property PACKAGE_PIN AF6 [get_ports {exit_value_o}]
+# set_property PACKAGE_PIN AH6 [get_ports {PL_LEDRGB3[1]}]
 # set_property PACKAGE_PIN AG5 [get_ports {PL_LEDRGB3[2]}]
 
 # LED BUFFERS

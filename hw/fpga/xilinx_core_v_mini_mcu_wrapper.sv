@@ -22,12 +22,14 @@ module xilinx_core_v_mini_mcu_wrapper
 `elsif FPGA_AUP_ZU3
     inout logic clk_100mhz_n,
     inout logic clk_100mhz_p,
+`ifdef PS_ENABLE
+
+`endif
 `elsif FPGA_GENESYS2
     inout logic clk_200mhz_n,
     inout logic clk_200mhz_p,
 `else
     inout logic clk_i,
-
 `ifdef PS_ENABLE
     inout logic [14:0] DDR_addr,
     inout logic [2:0] DDR_ba,
@@ -153,6 +155,11 @@ module xilinx_core_v_mini_mcu_wrapper
       .CLK_IN1_D_0_clk_p(clk_100mhz_p),
       .clk_out1_0(clk_gen)
   );
+
+`ifdef PS_ENABLE
+  (* DONT_TOUCH = "true" *)
+  xilinx_ps_wizard_wrapper xilinx_ps_wizard_wrapper_i (  /* unused */);
+`endif
 `elsif FPGA_GENESYS2
   xilinx_clk_wizard_wrapper xilinx_clk_wizard_wrapper_i (
       .CLK_IN1_D_0_clk_n(clk_200mhz_n),
@@ -172,7 +179,7 @@ module xilinx_core_v_mini_mcu_wrapper
 
 `ifdef PS_ENABLE
   (* DONT_TOUCH = "true" *)
-  xilinx_ps_wizzard_wrapper xilinx_ps_wizard_wrapper_i (
+  xilinx_ps_wizard_wrapper xilinx_ps_wizard_wrapper_i (
       .DDR_addr(DDR_addr),
       .DDR_ba(DDR_ba),
       .DDR_cas_n(DDR_cas_n),

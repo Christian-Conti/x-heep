@@ -59,6 +59,50 @@ Or simply type:
 make vivado-fpga-pgm FPGA_BOARD=<BOARD_NAME>
 ```
 
+### Build and program the FPGA remotely using the Processing System
+
+The Processing System (PS) enables remote access to the SoC over SSH. With the PYNQ utilities, you can connect to the board and program the FPGA by loading the bitstream from Python.
+
+Enabling the FuseSoC flag `ps` instantiates the PS in the design (currently supported only on `pynq-z2` and `aup-zu3`):
+
+```bash
+make vivado-fpga FPGA_BOARD=pynq-z2 FUSESOC_FLAGS=--flag=ps
+```
+
+### Upload the bitstream to the remote board
+
+You must upload both the `.bit` and the `.hwh` file to the board.
+
+Manual upload:
+
+```bash
+scp openhwgroup.org_systems_core-v-mini-mcu_<version>.bit board@remote-host:/path/to/bitstream/
+scp xilinx_ps_wizzard.hwh board@remote-host:/path/to/bitstream/openhwgroup.org_systems_core-v-mini-mcu_<version>.hwh
+```
+
+Or simply type:
+
+```bash
+make vivado-fpga-remote-pgm FPGA_BOARD=<BOARD_NAME> REMOTE=board@remote-host REMOTE_DIR=/path/to/bitstream
+```
+
+> **Important:** the `.bit` and `.hwh` files must have the same base name and be located in the same directory, otherwise the bitstream will not load correctly.
+
+### Program the FPGA on the remote board
+
+SSH into the board, activate the PYNQ environment, and load the overlay:
+
+```
+$ ssh board@remote-host
+
+$ sudo -i
+# source /etc/profile.d/pynq-venv.sh
+
+# python
+>>> from pynq import Overlay
+>>> ol = Overlay("/path/to/bitstream.bit")
+```
+
 ## Running firmware on the FPGA
 
 To run SW, follow the [Debug](./../How_to/Debug.md) guide to load the binaries with the HS2 cable over JTAG,

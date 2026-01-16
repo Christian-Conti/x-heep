@@ -10,9 +10,11 @@
 // Task for loading 'mem' with SystemVerilog system task $readmemh()
 export "DPI-C" task tb_readHEX;
 export "DPI-C" task tb_loadHEX;
+`ifndef XILINX_SIMULATOR
 % for bank in memory_ss.iter_ram_banks():
 export "DPI-C" task tb_writetoSram${bank.name()};
 % endfor
+`endif
 export "DPI-C" task tb_getMemSize;
 export "DPI-C" task tb_set_exit_loop;
 export "DPI-C" task load_flash_hex;
@@ -89,23 +91,48 @@ task tb_loadHEX;
 endtask
 
 % for bank in memory_ss.iter_ram_banks():
-task tb_writetoSram${bank.name()};
-  input int addr;
-  input [7:0] val3;
-  input [7:0] val2;
-  input [7:0] val1;
-  input [7:0] val0;
-`ifdef VCS
-  force x_heep_system_i.core_v_mini_mcu_i.memory_subsystem_i.ram${bank.name()}_i.tc_ram_i.sram[addr] = {
-    val3, val2, val1, val0
-  };
-  release x_heep_system_i.core_v_mini_mcu_i.memory_subsystem_i.ram${bank.name()}_i.tc_ram_i.sram[addr];
+`ifdef XILINX_SIMULATOR
+  int          __tb_sram_${bank.name()}_addr;
+  logic [31:0] __tb_sram_${bank.name()}_data;
+  logic        __tb_sram_${bank.name()}_kick;
+
+  initial __tb_sram_${bank.name()}_kick = 1'b0;
+
+  always @(__tb_sram_${bank.name()}_kick) begin : __tb_sram_${bank.name()}_worker
+    x_heep_system_i.core_v_mini_mcu_i.memory_subsystem_i.ram${bank.name()}_i.tc_ram_i.sram[__tb_sram_${bank.name()}_addr] = __tb_sram_${bank.name()}_data;
+  end
+
+  task tb_writetoSram${bank.name()};
+    input int addr;
+    input [7:0] val3;
+    input [7:0] val2;
+    input [7:0] val1;
+    input [7:0] val0;
+
+    __tb_sram_${bank.name()}_addr = addr;
+    __tb_sram_${bank.name()}_data = {val3, val2, val1, val0};
+    __tb_sram_${bank.name()}_kick = ~__tb_sram_${bank.name()}_kick;
+  endtask
+
 `else
-  x_heep_system_i.core_v_mini_mcu_i.memory_subsystem_i.ram${bank.name()}_i.tc_ram_i.sram[addr] = {
-    val3, val2, val1, val0
-  };
+  task tb_writetoSram${bank.name()};
+    input int addr;
+    input [7:0] val3;
+    input [7:0] val2;
+    input [7:0] val1;
+    input [7:0] val0;
+`ifdef VCS
+    force x_heep_system_i.core_v_mini_mcu_i.memory_subsystem_i.ram${bank.name()}_i.tc_ram_i.sram[addr] = {
+      val3, val2, val1, val0
+    };
+    release x_heep_system_i.core_v_mini_mcu_i.memory_subsystem_i.ram${bank.name()}_i.tc_ram_i.sram[addr];
+`else
+    x_heep_system_i.core_v_mini_mcu_i.memory_subsystem_i.ram${bank.name()}_i.tc_ram_i.sram[addr] = {
+      val3, val2, val1, val0
+    };
 `endif
-endtask
+  endtask
+`endif
 
 % endfor
 

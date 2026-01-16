@@ -431,11 +431,10 @@ targets:
           - "-Wall"
       xsim:
         xelab_options:
-          - -d XSIM
+          - -relax
+          - -debug all
           - -timescale 1ns/1ps
           - -override_timeunit
-          - -debug all
-          - -relax
           - -sv_lib ../../../hw/vendor/lowrisc_opentitan/hw/dv/dpi/uartdpi/uartdpi.so
           - -sv_lib ../../../hw/vendor/pulp_platform_pulpissimo/rtl/tb/remote_bitbang/librbs.so
 

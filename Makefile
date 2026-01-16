@@ -44,6 +44,7 @@ BUILD_DIR         = build
 FUSESOC_BUILD_DIR = $(shell find $(BUILD_DIR) -maxdepth 1 -type d -name 'openhwgroup.org_systems_core-v-mini-mcu_*' 2>/dev/null | sort -V | head -n 1)
 VERILATOR_DIR     = $(FUSESOC_BUILD_DIR)/sim-verilator
 QUESTASIM_DIR     = $(FUSESOC_BUILD_DIR)/sim-modelsim
+XSIM_DIR     	  = $(FUSESOC_BUILD_DIR)/sim-xsim
 
 # Project options are based on the app to be built (default - hello_world)
 PROJECT  ?= hello_world
@@ -283,9 +284,13 @@ verilator-run-sc:
 verilator-waves: .check-gtkwave
 	gtkwave $(VERILATOR_DIR)/waveform.fst
 
-## Xsim simulation
+## Xilinx simulator
 xsim-build:
 	$(FUSESOC) --cores-root . run --no-export --target=sim --tool=xsim $(FUSESOC_FLAGS) --build openhwgroup.org:systems:core-v-mini-mcu $(FUSESOC_PARAM) 2>&1 | tee buildsim.log
+
+## Launches the RTL simulation with the compiled firmware (`app` target) using
+xsim-run:
+	$(MAKE) -C $(XSIM_DIR) run EXTRA_OPTIONS="-testplusarg firmware=../../../sw/build/main.hex $(SIM_ARGS)"
 
 ## @section Vivado
 

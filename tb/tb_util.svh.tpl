@@ -92,9 +92,9 @@ endtask
 
 % for bank in memory_ss.iter_ram_banks():
 `ifdef XILINX_SIMULATOR
-  int          __tb_sram_${bank.name()}_addr;
-  logic [31:0] __tb_sram_${bank.name()}_data;
-  logic        __tb_sram_${bank.name()}_kick;
+  int __tb_sram_${bank.name()}_addr;
+  logic [31:0]__tb_sram_${bank.name()}_data;
+  logic __tb_sram_${bank.name()}_kick;
 
   initial __tb_sram_${bank.name()}_kick = 1'b0;
 

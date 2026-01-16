@@ -283,6 +283,10 @@ verilator-run-sc:
 verilator-waves: .check-gtkwave
 	gtkwave $(VERILATOR_DIR)/waveform.fst
 
+## Xsim simulation
+xsim-build:
+	$(FUSESOC) --cores-root . run --no-export --target=sim --tool=xsim $(FUSESOC_FLAGS) --build openhwgroup.org:systems:core-v-mini-mcu $(FUSESOC_PARAM) 2>&1 | tee buildsim.log
+
 ## @section Vivado
 
 ## Builds (synthesis and implementation) the bitstream for the FPGA version using Vivado

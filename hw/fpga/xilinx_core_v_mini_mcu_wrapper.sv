@@ -27,7 +27,7 @@ module xilinx_core_v_mini_mcu_wrapper
     inout logic clk_200mhz_p,
 `else
     inout logic clk_i,
-  `ifdef PS_ENABLE
+`ifdef PS_ENABLE
     inout logic [14:0] DDR_addr,
     inout logic [2:0] DDR_ba,
     inout logic DDR_cas_n,
@@ -49,7 +49,7 @@ module xilinx_core_v_mini_mcu_wrapper
     inout logic FIXED_IO_ps_clk,
     inout logic FIXED_IO_ps_porb,
     inout logic FIXED_IO_ps_srstb,
-  `endif
+`endif
 `endif
 
     inout logic rst_i,

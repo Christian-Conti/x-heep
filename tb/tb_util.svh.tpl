@@ -133,7 +133,6 @@ endtask
 `endif
   endtask
 `endif
-
 % endfor
 
 task tb_set_exit_loop;

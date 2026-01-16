@@ -290,7 +290,7 @@ xsim-build:
 
 ## Launches the RTL simulation with the compiled firmware (`app` target) using
 xsim-run:
-	$(MAKE) -C $(XSIM_DIR) run EXTRA_OPTIONS="-testplusarg firmware=../../../sw/build/main.hex $(SIM_ARGS)"
+	$(MAKE) -C $(XSIM_DIR) run EXTRA_OPTIONS="--testplusarg firmware=../../../sw/build/main.hex $(SIM_ARGS)"
 
 ## @section Vivado
 

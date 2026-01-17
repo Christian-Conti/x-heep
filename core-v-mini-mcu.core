@@ -139,6 +139,11 @@ filesets:
     - scripts/sim/compile_uart_dpi.sh
     file_type: user
 
+  xsim_pre_build_uartdpi:
+    files:
+    - scripts/sim/xsim/compile_uart_dpi.sh
+    file_type: user
+
   cfile_uartdpi:
     files:
     - ./hw/vendor/lowrisc_opentitan/hw/dv/dpi/uartdpi/uartdpi.c
@@ -303,6 +308,10 @@ scripts:
     cmd:
     - sh
     - ../../../scripts/sim/compile_uart_dpi.sh
+  xsim_pre_build_uartdpi:
+    cmd:
+    - sh
+    - ../../../scripts/sim/xsim/compile_uart_dpi.sh
   pre_patch_modelsim_Makefile:
     cmd:
     - python
@@ -340,12 +349,12 @@ targets:
     - tool_vcs? (pre_build_remote_bitbang)
     - tool_xcelium? (pre_build_remote_bitbang)
     - tool_xcelium? (pre_build_uartdpi)
+    - tool_xsim? (pre_build_remote_bitbang)
+    - tool_xsim? (xsim_pre_build_uartdpi)
     - tool_verilator? (tb-verilator)
     - tool_modelsim? (tb-sv)
     - tool_vcs? (tb-sv)
     - tool_xcelium? (tb-sv)
-    - tool_xsim? (pre_build_remote_bitbang)
-    - tool_xsim? (pre_build_uartdpi)
     - tool_xsim? (tb-xsim)
     - "!integrated_heep? (x_heep_system)"
     toplevel:
@@ -362,7 +371,7 @@ targets:
         - ams_sim? (pre_patch_vcs_ams_Makefile)
         - tool_xcelium? (pre_build_uartdpi)
         - tool_xcelium? (pre_build_remote_bitbang)
-        - tool_xsim? (pre_build_uartdpi)
+        - tool_xsim? (xsim_pre_build_uartdpi)
         - tool_xsim? (pre_build_remote_bitbang)
       pre_run:
         - remove_uart_log

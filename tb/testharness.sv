@@ -409,8 +409,9 @@ module testharness #(
   ) i_uart0 (
       .clk_i,
       .rst_ni,
-      .tx_o(uart_rx),
-      .rx_i(uart_tx)
+      .active(1'b1),
+      .tx_o  (uart_rx),
+      .rx_i  (uart_tx)
   );
 
   // jtag calls from dpi

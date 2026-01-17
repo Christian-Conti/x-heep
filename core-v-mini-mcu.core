@@ -402,21 +402,21 @@ targets:
         - -voptargs=+acc=npr
       vcs:
         vcs_options:
-         - -override_timescale=1ns/1ps
-         - -assert disable_cover
-         - -assert svaext
-         - -debug_access+all+dmptf
-         - -fgp
-         - -full64
-         - -kdb
-         - -notice
-         - -ntb_opts error
-         - -race=all
-         - -xlrm uniq_prior_final
-         - -CFLAGS "-std=c++14 -pthread"
-         - -LDFLAGS "-pthread -lutil"
-         - +lint=TFIPC-L
-         - -V
+        - -override_timescale=1ns/1ps
+        - -assert disable_cover
+        - -assert svaext
+        - -debug_access+all+dmptf
+        - -fgp
+        - -full64
+        - -kdb
+        - -notice
+        - -ntb_opts error
+        - -race=all
+        - -xlrm uniq_prior_final
+        - -CFLAGS "-std=c++14 -pthread"
+        - -LDFLAGS "-pthread -lutil"
+        - +lint=TFIPC-L
+        - -V
       xcelium:
         xrun_options:
         - -vtimescale 1ns/10ps

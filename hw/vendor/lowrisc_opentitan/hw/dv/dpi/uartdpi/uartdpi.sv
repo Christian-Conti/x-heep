@@ -1,14 +1,16 @@
-// Copyright lowRISC contributors.
+// Copyright lowRISC contributors (OpenTitan project).
 // Licensed under the Apache License, Version 2.0, see LICENSE for details.
 // SPDX-License-Identifier: Apache-2.0
 
 module uartdpi #(
-  parameter BAUD = 'x,
-  parameter FREQ = 'x,
-  parameter string NAME = "uart0"
-)(
+  parameter integer BAUD        = 'x,
+  parameter integer FREQ        = 'x,
+  parameter string  NAME        = "uart0",
+  parameter string  EXIT_STRING = ""
+) (
   input  logic clk_i,
   input  logic rst_ni,
+  input  bit   active,
 
   output logic tx_o,
   input  logic rx_i
@@ -20,7 +22,7 @@ module uartdpi #(
   localparam int CYCLES_PER_SYMBOL = FREQ / BAUD;
 
   import "DPI-C" function
-    chandle uartdpi_create(input string name, input string log_file_path);
+    chandle uartdpi_create(input string name, input string log_file_path, input string exit_string);
 
   import "DPI-C" function
     void uartdpi_close(input chandle ctx);
@@ -32,14 +34,25 @@ module uartdpi #(
     int uartdpi_can_read(input chandle ctx);
 
   import "DPI-C" function
-    void uartdpi_write(input chandle ctx, int data);
+    int uartdpi_write(input chandle ctx, int data);
 
   chandle ctx;
   string log_file_path = DEFAULT_LOG_FILE;
 
+  function automatic void initialize();
+    string plusarg_name = {"UARTDPI_LOG_", NAME};
+    if (!$value$plusargs({plusarg_name, "=%s"}, log_file_path)) begin
+      $display($sformatf("No %s plusarg found.", plusarg_name));
+    end
+    ctx = uartdpi_create(NAME, log_file_path, EXIT_STRING);
+  endfunction
+
   initial begin
-    $value$plusargs({"UARTDPI_LOG_", NAME, "=%s"}, log_file_path);
-    ctx = uartdpi_create(NAME, log_file_path);
+    if (active) initialize();
+  end
+
+  always @(posedge active) begin
+    if (ctx == null) initialize();
   end
 
   final begin
@@ -49,12 +62,15 @@ module uartdpi #(
 
   // TX
   reg txactive;
-  int  txcount;
-  int  txcyccount;
+  int txcount;
+  int txcyccount;
   reg [9:0] txsymbol;
-  reg seen_reset;
+  bit seen_reset;
 
-  always_ff @(negedge clk_i or negedge rst_ni) begin
+  logic eff_clk;
+  assign eff_clk = clk_i & active;
+
+  always_ff @(negedge eff_clk or negedge rst_ni) begin
     if (!rst_ni) begin
       tx_o <= 1;
       txactive <= 0;
@@ -82,26 +98,13 @@ module uartdpi #(
     end
   end
 
-`ifndef VCS
-`ifndef MODELSIM
-`ifndef XCELIUM
-`ifndef XILINX_SIMULATOR
-  initial begin
-    // Prevent falling edges of rx_i before reset causing spurious characters
-    seen_reset = 0;
-  end
-`endif
-`endif
-`endif
-`endif
-
   // RX
   reg rxactive;
   int rxcount;
   int rxcyccount;
   reg [7:0] rxsymbol;
 
-  always_ff @(negedge clk_i or negedge rst_ni) begin
+  always_ff @(negedge eff_clk or negedge rst_ni) begin
     rxcyccount <= rxcyccount + 1;
 
     if (!rst_ni) begin
@@ -134,7 +137,13 @@ module uartdpi #(
           if (rxcyccount == CYCLES_PER_SYMBOL - 1) begin
             rxactive <= 0;
             if (rx_i) begin
-              uartdpi_write(ctx, rxsymbol);
+              // Write a message through the uart (using the uartdpi DPI library). By default, this
+              // always returns 0 but it can be configured to return 1 if it sees a particular
+              // string (the "EXIT_STRING"). If that happens, stop the simulation.
+              if(uartdpi_write(ctx, rxsymbol) != 0) begin
+                $display("Exiting the simulator because the magic UART string was seen.");
+                $finish(0);
+              end
             end
           end
         end

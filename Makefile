@@ -291,7 +291,7 @@ xsim-build:
 		--xsim_options="$(SIM_ARGS)" 2>&1 | tee buildsim.log
 
 ## Launches the RTL simulation with the compiled firmware (`app` target) using
-## the Xilinx simulator model previously built (`xilinx-build` target).
+## the Xilinx simulator model previously built (`xsim-build` target).
 xsim-run:
 	$(FUSESOC) --cores-root . run --no-export --target=sim --tool=xsim $(FUSESOC_FLAGS) --run openhwgroup.org:systems:core-v-mini-mcu $(FUSESOC_PARAM)
 	

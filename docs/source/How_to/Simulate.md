@@ -234,10 +234,10 @@ With the Xilinx simulator, they are incorporated into the generated run script d
 
 Plusarguments should be provided when invoking `make xsim-build`.
 
-Furthermore, Xilinx simulator requires plusargs to be specified using `--testplusarg`, and the argument itself (e.g. `--plusarg firmware=...`, `--plusarg verbose`), rather than using `+`.
+Furthermore, Xilinx simulator requires plusargs to be specified using `--testplusarg`, and the argument itself (e.g. `--testplusarg firmware=...`, `--testplusarg verbose`), rather than using `+`.
 
 ```bash
-make xsim-build SIM_ARGS='--testplusarg firmware=../../../sw/build/main.hex --testplusarg verbose'
+make xsim-build SIM_ARGS="--testplusarg firmware=../../../sw/build/main.hex --testplusarg verbose"
 
 ```
 

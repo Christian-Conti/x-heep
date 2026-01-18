@@ -448,8 +448,8 @@ targets:
           - -sv_lib ../../../hw/vendor/pulp_platform_pulpissimo/rtl/tb/remote_bitbang/librbs.so
         xsim_options:
           - -wdb waveform.wdb
-          - -tclbatch # necessary to log waves
-          - ../../../scripts/sim/xsim/log_waves.tcl
+          - -tclbatch
+          - ../../../scripts/sim/xsim/log_waves.tcl # necessary to log waves
 
   sim_sc:
     <<: *default_target

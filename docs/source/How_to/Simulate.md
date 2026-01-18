@@ -194,20 +194,6 @@ make xsim-waves
 
 This will open a Vivado instance in a `wiev only mode` in which is possible to wiev the waveforms of your last simulation.
 
-### Plus arguments
-
-When using the Xilinx simulator, plusargs (e.g. `firmware`, `verbose`, etc.) must be passed through `xsim_options`.
-With the Xilinx simulator, they are incorporated into the generated run script during the build phase.
-
-Plusarguments should be provided when invoking `make xsim-build`.
-
-Furthermore, Xilinx simulator requires plusargs to be specified using `--testplusarg`, and the argument itself (e.g. `--plusarg firmware=...`, `--plusarg verbose`), rather than using `+`.
-
-```bash
-make xsim-build SIM_ARGS='--testplusarg firmware=../../../sw/build/main.hex --testplusarg verbose'
-
-```
-
 ## Simulation parameters
 
 You may pass additional simulation parameters to the generated simulation executable, in the form of *plusargs*: `+<parameter>=<value>`.
@@ -237,6 +223,21 @@ You may pass additional simulation parameters to the generated simulation execut
   (Note that there's no space between the number and the unit, and that fractional values are not supported.)
 
   If you're launching the Verilator simulation via `make`, you may pass this parameter via the `MAX_SIM_TIME=` command-line argument, e.g. `make verilator-run MAX_SIM_TIME=750us`.
+
+
+### Xilinx simulator
+
+When using the Xilinx simulator, plusargs (e.g. `firmware`, `verbose`, etc.) must be passed through `xsim_options`.
+With the Xilinx simulator, they are incorporated into the generated run script during the build phase.
+
+Plusarguments should be provided when invoking `make xsim-build`.
+
+Furthermore, Xilinx simulator requires plusargs to be specified using `--testplusarg`, and the argument itself (e.g. `--plusarg firmware=...`, `--plusarg verbose`), rather than using `+`.
+
+```bash
+make xsim-build SIM_ARGS='--testplusarg firmware=../../../sw/build/main.hex --testplusarg verbose'
+
+```
 
 ## Simulating the UART DPI
 

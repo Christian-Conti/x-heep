@@ -224,6 +224,8 @@ You may pass additional simulation parameters to the generated simulation execut
 
   If you're launching the Verilator simulation via `make`, you may pass this parameter via the `MAX_SIM_TIME=` command-line argument, e.g. `make verilator-run MAX_SIM_TIME=750us`.
 
+- `+verbose`:
+  Increases the simulation debug verbosity, printing additional runtime information to help with troubleshooting.
 
 ### Xilinx simulator
 

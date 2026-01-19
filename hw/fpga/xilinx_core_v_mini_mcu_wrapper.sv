@@ -108,6 +108,17 @@ module xilinx_core_v_mini_mcu_wrapper
   wire                               rst_n;
   logic [CLK_LED_COUNT_LENGTH - 1:0] clk_count;
 
+`ifdef PS_ENABLE
+  wire [1:0] ps_x_heep_i;
+  wire [2:0] ps_x_heep_o;
+  wire ps_tck;
+  wire ps_tdi;
+  wire ps_tdo;
+  wire ps_tms;
+  wire ps_uart_rx;
+  wire ps_uart_tx;
+`endif
+
   // low active reset
 `ifdef FPGA_NEXYS
   assign rst_n = rst_i;
@@ -155,7 +166,16 @@ module xilinx_core_v_mini_mcu_wrapper
 
 `ifdef PS_ENABLE
   (* DONT_TOUCH = "true" *)
-  xilinx_ps_wizard_wrapper xilinx_ps_wizard_wrapper_i (  /* unused */);
+  xilinx_ps_wizard_wrapper xilinx_ps_wizard_wrapper_i (
+      .ps_gpio_i(ps_x_heep_i),
+      .ps_gpio_o(ps_x_heep_o),
+      .ps_tck_o(ps_tck),
+      .ps_tdi_o(ps_tdi),
+      .ps_tdo_i(ps_tdo),
+      .ps_tms_o(ps_tms),
+      .ps_uart_rx_i(ps_uart_rx),
+      .ps_uart_tx_o(ps_uart_tx)
+  );
 `endif
 `elsif FPGA_GENESYS2
   xilinx_clk_wizard_wrapper xilinx_clk_wizard_wrapper_i (
@@ -245,8 +265,21 @@ module xilinx_core_v_mini_mcu_wrapper
       .external_subsystem_rst_no(),
       .external_ram_banks_set_retentive_no(),
       .external_subsystem_clkgate_en_no(),
-      .exit_value_o(exit_value),
       .clk_i(clk_gen),
+`ifdef PS_ENABLE
+      .rst_ni(ps_x_heep_o[0]),
+      .boot_select_i(ps_x_heep_o[1]),
+      .execute_from_flash_i(ps_x_heep_o[2]),
+      .jtag_tck_i(ps_tck),
+      .jtag_tms_i(ps_tms),
+      .jtag_trst_ni(1'b1  /*unused */),
+      .jtag_tdi_i(ps_tdi),
+      .jtag_tdo_o(ps_tdo),
+      .uart_rx_i(ps_uart_tx),
+      .uart_tx_o(ps_uart_rx),
+      .exit_valid_o(ps_x_heep_i[0]),
+      .exit_value_o(ps_x_heep_i[1]),
+`else
       .rst_ni(rst_n),
       .boot_select_i(boot_select_i),
       .execute_from_flash_i(execute_from_flash_i),
@@ -258,6 +291,8 @@ module xilinx_core_v_mini_mcu_wrapper
       .uart_rx_i(uart_rx_i),
       .uart_tx_o(uart_tx_o),
       .exit_valid_o(exit_valid_o),
+      .exit_value_o(exit_value),
+`endif
       .gpio_0_io(gpio_io[0]),
       .gpio_1_io(gpio_io[1]),
       .gpio_2_io(gpio_io[2]),

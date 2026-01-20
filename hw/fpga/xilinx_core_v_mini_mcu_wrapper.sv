@@ -165,7 +165,6 @@ module xilinx_core_v_mini_mcu_wrapper
   );
 
 `ifdef PS_ENABLE
-  (* DONT_TOUCH = "true" *)
   xilinx_ps_wizard_wrapper xilinx_ps_wizard_wrapper_i (
       .ps_gpio_i(ps_x_heep_i),
       .ps_gpio_o(ps_x_heep_o),
@@ -195,7 +194,6 @@ module xilinx_core_v_mini_mcu_wrapper
   );
 
 `ifdef PS_ENABLE
-  (* DONT_TOUCH = "true" *)
   xilinx_ps_wizard_wrapper xilinx_ps_wizard_wrapper_i (
       .DDR_addr(DDR_addr),
       .DDR_ba(DDR_ba),

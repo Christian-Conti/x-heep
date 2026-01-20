@@ -2,43 +2,52 @@ diff --git a/hw/dv/dpi/uartdpi/uartdpi.h b/hw/dv/dpi/uartdpi/uartdpi.h
 index 29d50a5a28..2149fb1155 100644
 --- a/hw/dv/dpi/uartdpi/uartdpi.h
 +++ b/hw/dv/dpi/uartdpi/uartdpi.h
-@@ -5,7 +5,9 @@
- #ifndef OPENTITAN_HW_DV_DPI_UARTDPI_UARTDPI_H_
- #define OPENTITAN_HW_DV_DPI_UARTDPI_UARTDPI_H_
+@@ -9,7 +9,7 @@ module uartdpi #(
+ )(
+   input  logic clk_i,
+   input  logic rst_ni,
+-
++  input  logic active,
+   output logic tx_o,
+   input  logic rx_i
+ );
+@@ -35,11 +35,22 @@ module uartdpi #(
+     void uartdpi_write(input chandle ctx, int data);
  
-+#ifdef __cplusplus
- extern "C" {
-+#endif
+   chandle ctx;
++
+   string log_file_path = DEFAULT_LOG_FILE;
++  function automatic void initialize();
++    string plusarg_name = {"UARTDPI_LOG_", NAME};
++    if (!$value$plusargs({plusarg_name, "=%s"}, log_file_path)) begin
++      $display($sformatf("No %s plusarg found.", plusarg_name));
++    end
++    ctx = uartdpi_create(NAME, log_file_path);
++  endfunction
  
- #include <stdio.h>
- 
-@@ -22,5 +24,7 @@ void uartdpi_close(void *ctx_void);
- int uartdpi_can_read(void *ctx_void);
- char uartdpi_read(void *ctx_void);
- void uartdpi_write(void *ctx_void, char c);
-+#ifdef __cplusplus
- }
-+#endif
- #endif  // OPENTITAN_HW_DV_DPI_UARTDPI_UARTDPI_H_
-diff --git a/hw/dv/dpi/uartdpi/uartdpi.sv b/hw/dv/dpi/uartdpi/uartdpi.sv
-index 97fae47674..2be4df54ff 100644
---- a/hw/dv/dpi/uartdpi/uartdpi.sv
-+++ b/hw/dv/dpi/uartdpi/uartdpi.sv
-@@ -82,11 +82,16 @@ module uartdpi #(
-     end
+   initial begin
+-    $value$plusargs({"UARTDPI_LOG_", NAME, "=%s"}, log_file_path);
+-    ctx = uartdpi_create(NAME, log_file_path);
++    if (active) initialize();
++  end
++
++  always @(posedge active) begin
++    if (ctx == null) initialize();
    end
  
--
-+`ifndef VCS
-+`ifndef MODELSIM
-+`ifndef XCELIUM
+   final begin
+@@ -85,12 +96,14 @@ module uartdpi #(
+ `ifndef VCS
+ `ifndef MODELSIM
+ `ifndef XCELIUM
++`ifndef XILINX_SIMULATOR
    initial begin
      // Prevent falling edges of rx_i before reset causing spurious characters
      seen_reset = 0;
    end
+ `endif
+ `endif
 +`endif
-+`endif
-+`endif
+ `endif
  
    // RX
-   reg rxactive;

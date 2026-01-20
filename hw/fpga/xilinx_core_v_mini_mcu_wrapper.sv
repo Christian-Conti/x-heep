@@ -110,7 +110,7 @@ module xilinx_core_v_mini_mcu_wrapper
 
 `ifdef PS_ENABLE
   wire [1:0] ps_x_heep_i;
-  wire [2:0] ps_x_heep_o;
+  wire [3:0] ps_x_heep_o;
   wire ps_tck;
   wire ps_tdi;
   wire ps_tdo;
@@ -170,8 +170,8 @@ module xilinx_core_v_mini_mcu_wrapper
       .ps_gpio_i(ps_x_heep_i),
       .ps_gpio_o(ps_x_heep_o),
       .ps_tck_o(ps_tck),
-      .ps_tdi_o(ps_tdi),
-      .ps_tdo_i(ps_tdo),
+      .ps_tdi_o(ps_tdo),
+      .ps_tdo_i(ps_tdi),
       .ps_tms_o(ps_tms),
       .ps_uart_rx_i(ps_uart_rx),
       .ps_uart_tx_o(ps_uart_tx)
@@ -272,9 +272,9 @@ module xilinx_core_v_mini_mcu_wrapper
       .execute_from_flash_i(ps_x_heep_o[2]),
       .jtag_tck_i(ps_tck),
       .jtag_tms_i(ps_tms),
-      .jtag_trst_ni(1'b1  /*unused */),
-      .jtag_tdi_i(ps_tdi),
-      .jtag_tdo_o(ps_tdo),
+      .jtag_trst_ni(ps_x_heep_o[3]),
+      .jtag_tdi_i(ps_tdo),
+      .jtag_tdo_o(ps_tdi),
       .uart_rx_i(ps_uart_tx),
       .uart_tx_o(ps_uart_rx),
       .exit_valid_o(ps_x_heep_i[0]),

@@ -1,0 +1,22 @@
+diff --git a/src/rr_arb_tree.sv b/src/rr_arb_tree.sv
+index 90301c8..0bbeb74 100644
+--- a/hw/vendor/pulp_platform_common_cells/src/rr_arb_tree.sv
++++ b/hw/vendor/pulp_platform_common_cells/src/rr_arb_tree.sv
+@@ -111,7 +111,7 @@ module rr_arb_tree #(
+ 
+   // pragma translate_off
+   `ifndef VERILATOR
+-  `ifndef XSIM
++  `ifndef XILINX_SIMULATOR
+   // Default SVA reset
+   default disable iff (!rst_ni || flush_i);
+   `endif
+@@ -309,7 +309,7 @@ module rr_arb_tree #(
+ 
+     // pragma translate_off
+     `ifndef VERILATOR
+-    `ifndef XSIM
++    `ifndef XILINX_SIMULATOR
+     initial begin : p_assert
+       assert(NumIn)
+         else $fatal(1, "Input must be at least one element wide.");

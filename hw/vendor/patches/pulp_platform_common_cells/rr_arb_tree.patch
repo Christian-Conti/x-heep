@@ -1,4 +1,4 @@
-diff --git a/src/rr_arb_tree.sv b/src/rr_arb_tree.sv
+diff --git a/hw/vendor/pulp_platform_common_cells/src/rr_arb_tree.sv b/hw/vendor/pulp_platform_common_cells/src/rr_arb_tree.sv
 index 90301c8..0bbeb74 100644
 --- a/hw/vendor/pulp_platform_common_cells/src/rr_arb_tree.sv
 +++ b/hw/vendor/pulp_platform_common_cells/src/rr_arb_tree.sv

@@ -1,7 +1,7 @@
-diff --git a/hw/dv/dpi/uartdpi/uartdpi.h b/hw/dv/dpi/uartdpi/uartdpi.h
-index 29d50a5a28..2149fb1155 100644
---- a/hw/dv/dpi/uartdpi/uartdpi.h
-+++ b/hw/dv/dpi/uartdpi/uartdpi.h
+diff --git a/hw/vendor/lowrisc_opentitan/hw/dv/dpi/uartdpi/uartdpi.sv b/hw/vendor/lowrisc_opentitan/hw/dv/dpi/uartdpi/uartdpi.sv
+index 2be4df5..6a3be68 100644
+--- a/hw/vendor/lowrisc_opentitan/hw/dv/dpi/uartdpi/uartdpi.sv
++++ b/hw/vendor/lowrisc_opentitan/hw/dv/dpi/uartdpi/uartdpi.sv
 @@ -9,7 +9,7 @@ module uartdpi #(
  )(
    input  logic clk_i,

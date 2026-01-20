@@ -217,7 +217,15 @@ module xilinx_core_v_mini_mcu_wrapper
       .FIXED_IO_mio(FIXED_IO_mio),
       .FIXED_IO_ps_clk(FIXED_IO_ps_clk),
       .FIXED_IO_ps_porb(FIXED_IO_ps_porb),
-      .FIXED_IO_ps_srstb(FIXED_IO_ps_srstb)
+      .FIXED_IO_ps_srstb(FIXED_IO_ps_srstb),
+      .ps_gpio_i(ps_x_heep_i),
+      .ps_gpio_o(ps_x_heep_o),
+      .ps_tck_o(ps_tck),
+      .ps_tdi_o(ps_tdo),
+      .ps_tdo_i(ps_tdi),
+      .ps_tms_o(ps_tms),
+      .ps_uart_rx_i(ps_uart_rx),
+      .ps_uart_tx_o(ps_uart_tx)
   );
 `endif
 `endif

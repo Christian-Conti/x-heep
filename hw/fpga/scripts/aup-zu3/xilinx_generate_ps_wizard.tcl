@@ -15,7 +15,7 @@ set ps_tdi_o [ create_bd_port -dir O ps_tdi_o ]
 set ps_tms_o [ create_bd_port -dir O ps_tms_o ]
 set ps_tck_o [ create_bd_port -dir O ps_tck_o ]
 set ps_tdo_i [ create_bd_port -dir I ps_tdo_i ]
-set ps_gpio_o [ create_bd_port -dir O -from 2 -to 0 ps_gpio_o ]
+set ps_gpio_o [ create_bd_port -dir O -from 3 -to 0 ps_gpio_o ]
 set ps_gpio_i [ create_bd_port -dir I -from 1 -to 0 ps_gpio_i ]
 
 # Create instance: axi_jtag, and set properties
@@ -302,7 +302,6 @@ set_property -dict [list \
   CONFIG.NUM_SI {1} \
 ] $axi_smc
 
-
 # Create instance: rst_ps8_0_96M, and set properties
 set rst_ps8_0_96M [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 rst_ps8_0_96M ]
 
@@ -318,7 +317,6 @@ set_property -dict [list \
   CONFIG.GPIO_BOARD_INTERFACE {Custom} \
   CONFIG.USE_BOARD_FLOW {true} \
 ] $axi_gpio
-
 
 # Create interface connections
 connect_bd_intf_net -intf_net axi_smc_M00_AXI [get_bd_intf_pins axi_smc/M00_AXI] [get_bd_intf_pins axi_jtag/s_axi]

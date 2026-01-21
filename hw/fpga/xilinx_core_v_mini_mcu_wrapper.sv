@@ -28,27 +28,27 @@ module xilinx_core_v_mini_mcu_wrapper
 `else
     inout logic clk_i,
 `ifdef PS_ENABLE
-    inout logic [14:0] DDR_addr,
-    inout logic [2:0] DDR_ba,
-    inout logic DDR_cas_n,
-    inout logic DDR_ck_n,
-    inout logic DDR_ck_p,
-    inout logic DDR_cke,
-    inout logic DDR_cs_n,
-    inout logic [3:0] DDR_dm,
-    inout logic [31:0] DDR_dq,
-    inout logic [3:0] DDR_dqs_n,
-    inout logic [3:0] DDR_dqs_p,
-    inout logic DDR_odt,
-    inout logic DDR_ras_n,
-    inout logic DDR_reset_n,
-    inout logic DDR_we_n,
-    inout logic FIXED_IO_ddr_vrn,
-    inout logic FIXED_IO_ddr_vrp,
-    inout logic [53:0] FIXED_IO_mio,
-    inout logic FIXED_IO_ps_clk,
-    inout logic FIXED_IO_ps_porb,
-    inout logic FIXED_IO_ps_srstb,
+    inout [14:0]DDR_addr,
+    inout [2:0]DDR_ba,
+    inout DDR_cas_n,
+    inout DDR_ck_n,
+    inout DDR_ck_p,
+    inout DDR_cke,
+    inout DDR_cs_n,
+    inout [3:0]DDR_dm,
+    inout [31:0]DDR_dq,
+    inout [3:0]DDR_dqs_n,
+    inout [3:0]DDR_dqs_p,
+    inout DDR_odt,
+    inout DDR_ras_n,
+    inout DDR_reset_n,
+    inout DDR_we_n,
+    inout FIXED_IO_ddr_vrn,
+    inout FIXED_IO_ddr_vrp,
+    inout [53:0]FIXED_IO_mio,
+    inout FIXED_IO_ps_clk,
+    inout FIXED_IO_ps_porb,
+    inout FIXED_IO_ps_srstb,
 `endif
 `endif
 
@@ -117,6 +117,8 @@ module xilinx_core_v_mini_mcu_wrapper
   wire ps_tms;
   wire ps_uart_rx;
   wire ps_uart_tx;
+
+  wire exit_valid;
 `endif
 
   // low active reset
@@ -273,7 +275,7 @@ module xilinx_core_v_mini_mcu_wrapper
       .external_subsystem_clkgate_en_no(),
       .clk_i(clk_gen),
 `ifdef PS_ENABLE
-      .rst_ni(ps_x_heep_o[0]),
+      .rst_ni(ps_x_heep_o[0] & rst_n),
       .boot_select_i(ps_x_heep_o[1]),
       .execute_from_flash_i(ps_x_heep_o[2]),
       .jtag_tck_i(ps_tck),
@@ -283,8 +285,7 @@ module xilinx_core_v_mini_mcu_wrapper
       .jtag_tdo_o(ps_tdi),
       .uart_rx_i(ps_uart_tx),
       .uart_tx_o(ps_uart_rx),
-      .exit_valid_o(ps_x_heep_i[0]),
-      .exit_value_o(ps_x_heep_i[1]),
+      .exit_valid_o(exit_valid),
 `else
       .rst_ni(rst_n),
       .boot_select_i(boot_select_i),
@@ -297,8 +298,8 @@ module xilinx_core_v_mini_mcu_wrapper
       .uart_rx_i(uart_rx_i),
       .uart_tx_o(uart_tx_o),
       .exit_valid_o(exit_valid_o),
-      .exit_value_o(exit_value),
 `endif
+      .exit_value_o(exit_value),
       .gpio_0_io(gpio_io[0]),
       .gpio_1_io(gpio_io[1]),
       .gpio_2_io(gpio_io[2]),
@@ -354,5 +355,10 @@ module xilinx_core_v_mini_mcu_wrapper
   );
 
   assign exit_value_o = exit_value[0];
+
+`ifdef PS_ENABLE
+  assign ps_x_heep_i[0] = exit_valid;
+  assign ps_x_heep_i[1] = exit_value[0];
+`endif
 
 endmodule

@@ -5,20 +5,20 @@ set design_name xilinx_ps_wizard
 create_bd_design $design_name
 
 # Create interface ports
-  set DDR [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:ddrx_rtl:1.0 DDR ]
+set DDR [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:ddrx_rtl:1.0 DDR ]
 
-  set FIXED_IO [ create_bd_intf_port -mode Master -vlnv xilinx.com:display_processing_system7:fixedio_rtl:1.0 FIXED_IO ]
+set FIXED_IO [ create_bd_intf_port -mode Master -vlnv xilinx.com:display_processing_system7:fixedio_rtl:1.0 FIXED_IO ]
 
 
-  # Create ports
-  set ps_tms_o [ create_bd_port -dir O ps_tms_o ]
-  set ps_uart_tx_o [ create_bd_port -dir O ps_uart_tx_o ]
-  set ps_tdi_o [ create_bd_port -dir O ps_tdi_o ]
-  set ps_tdo_i [ create_bd_port -dir I ps_tdo_i ]
-  set ps_uart_rx_i [ create_bd_port -dir I ps_uart_rx_i ]
-  set ps_tck_o [ create_bd_port -dir O ps_tck_o ]
-  set ps_gpio_i [ create_bd_port -dir I -from 1 -to 0 ps_gpio_i ]
-  set ps_gpio_o [ create_bd_port -dir O -from 3 -to 0 ps_gpio_o ]
+# Create ports
+set ps_tms_o [ create_bd_port -dir O ps_tms_o ]
+set ps_gpio_i [ create_bd_port -dir I -from 1 -to 0 ps_gpio_i ]
+set ps_gpio_o [ create_bd_port -dir O -from 3 -to 0 ps_gpio_o ]
+set ps_uart_tx_o [ create_bd_port -dir O ps_uart_tx_o ]
+set ps_tdi_o [ create_bd_port -dir O ps_tdi_o ]
+set ps_tdo_i [ create_bd_port -dir I ps_tdo_i ]
+set ps_tck_o [ create_bd_port -dir O ps_tck_o ]
+set ps_uart_rx_i [ create_bd_port -dir I ps_uart_rx_i ]
 
 # Create instance: zynq_7_ps, and set properties
 set zynq_7_ps [ create_bd_cell -type ip -vlnv xilinx.com:ip:processing_system7:5.5 zynq_7_ps ]
@@ -385,7 +385,7 @@ set_property -dict [list \
   CONFIG.PCW_PACKAGE_NAME {clg400} \
   CONFIG.PCW_PCAP_PERIPHERAL_CLKSRC {IO PLL} \
   CONFIG.PCW_PCAP_PERIPHERAL_FREQMHZ {200} \
-  CONFIG.PCW_PERIPHERAL_BOARD_PRESET {part0} \
+  CONFIG.PCW_PERIPHERAL_BOARD_PRESET {None} \
   CONFIG.PCW_PLL_BYPASSMODE_ENABLE {0} \
   CONFIG.PCW_PRESET_BANK0_VOLTAGE {LVCMOS 3.3V} \
   CONFIG.PCW_PRESET_BANK1_VOLTAGE {LVCMOS 1.8V} \
@@ -553,33 +553,33 @@ set_property -dict [list \
 ] $zynq_7_ps
 
 
-# Create instance: axi_jtag, and set properties
-set axi_jtag [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_jtag:1.0 axi_jtag ]
-
 # Create instance: axi_uartlite, and set properties
 set axi_uartlite [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_uartlite:2.0 axi_uartlite ]
+
+# Create instance: axi_jtag, and set properties
+set axi_jtag [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_jtag:1.0 axi_jtag ]
 
 # Create instance: axi_gpio, and set properties
 set axi_gpio [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_gpio:2.0 axi_gpio ]
 set_property -dict [list \
-CONFIG.C_ALL_INPUTS_2 {1} \
-CONFIG.C_ALL_OUTPUTS {1} \
-CONFIG.C_GPIO2_WIDTH {2} \
-CONFIG.C_GPIO_WIDTH {4} \
-CONFIG.C_IS_DUAL {1} \
+  CONFIG.C_ALL_INPUTS_2 {1} \
+  CONFIG.C_ALL_OUTPUTS {1} \
+  CONFIG.C_GPIO2_WIDTH {2} \
+  CONFIG.C_GPIO_WIDTH {4} \
+  CONFIG.C_IS_DUAL {1} \
 ] $axi_gpio
 
 
 # Create instance: axi_smc, and set properties
 set axi_smc [ create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect:1.0 axi_smc ]
 set_property -dict [list \
-CONFIG.NUM_MI {3} \
-CONFIG.NUM_SI {1} \
+  CONFIG.NUM_MI {3} \
+  CONFIG.NUM_SI {1} \
 ] $axi_smc
 
 
-# Create instance: rst_zynq_7_ps_100M, and set properties
-set rst_zynq_7_ps_100M [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 rst_zynq_7_ps_100M ]
+# Create instance: rst_zynq_7_ps_1M, and set properties
+set rst_zynq_7_ps_1M [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 rst_zynq_7_ps_1M ]
 
 # Create interface connections
 connect_bd_intf_net -intf_net axi_smc_M00_AXI [get_bd_intf_pins axi_smc/M00_AXI] [get_bd_intf_pins axi_gpio/S_AXI]
@@ -602,7 +602,7 @@ connect_bd_net -net axi_uartlite_tx  [get_bd_pins axi_uartlite/tx] \
 [get_bd_ports ps_uart_tx_o]
 connect_bd_net -net gpio2_io_i_0_1  [get_bd_ports ps_gpio_i] \
 [get_bd_pins axi_gpio/gpio2_io_i]
-connect_bd_net -net rst_zynq_7_ps_100M_peripheral_aresetn  [get_bd_pins rst_zynq_7_ps_100M/peripheral_aresetn] \
+connect_bd_net -net rst_zynq_7_ps_1M_peripheral_aresetn  [get_bd_pins rst_zynq_7_ps_1M/peripheral_aresetn] \
 [get_bd_pins axi_gpio/s_axi_aresetn] \
 [get_bd_pins axi_smc/aresetn] \
 [get_bd_pins axi_jtag/s_axi_aresetn] \
@@ -615,11 +615,11 @@ connect_bd_net -net zynq_7_ps_FCLK_CLK0  [get_bd_pins zynq_7_ps/FCLK_CLK0] \
 [get_bd_pins zynq_7_ps/M_AXI_GP0_ACLK] \
 [get_bd_pins axi_smc/aclk] \
 [get_bd_pins axi_gpio/s_axi_aclk] \
-[get_bd_pins rst_zynq_7_ps_100M/slowest_sync_clk] \
+[get_bd_pins rst_zynq_7_ps_1M/slowest_sync_clk] \
 [get_bd_pins axi_jtag/s_axi_aclk] \
 [get_bd_pins axi_uartlite/s_axi_aclk]
 connect_bd_net -net zynq_7_ps_FCLK_RESET0_N  [get_bd_pins zynq_7_ps/FCLK_RESET0_N] \
-[get_bd_pins rst_zynq_7_ps_100M/ext_reset_in]
+[get_bd_pins rst_zynq_7_ps_1M/ext_reset_in]
 
 # Create address segments
 assign_bd_address -offset 0x41200000 -range 0x00010000 -target_address_space [get_bd_addr_spaces zynq_7_ps/Data] [get_bd_addr_segs axi_gpio/S_AXI/Reg] -force

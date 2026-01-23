@@ -57,6 +57,7 @@ module xilinx_core_v_mini_mcu_wrapper
     output logic rst_led_o,
     output logic clk_led_o,
 
+`ifndef PS_ENABLE
     inout logic boot_select_i,
     inout logic execute_from_flash_i,
 
@@ -68,6 +69,7 @@ module xilinx_core_v_mini_mcu_wrapper
 
     inout logic uart_rx_i,
     inout logic uart_tx_o,
+`endif
 
     inout logic [13:0] gpio_io,
 
@@ -359,6 +361,8 @@ module xilinx_core_v_mini_mcu_wrapper
 `ifdef PS_ENABLE
   assign ps_x_heep_i[0] = exit_valid;
   assign ps_x_heep_i[1] = exit_value[0];
+
+  assign exit_valid_o   = exit_valid;
 `endif
 
 endmodule

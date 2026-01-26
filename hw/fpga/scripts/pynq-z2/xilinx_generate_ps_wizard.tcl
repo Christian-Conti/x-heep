@@ -4,6 +4,10 @@ set_property BOARD_PART tul.com.tw:pynq-z2:part0:1.0 [current_project]
 set design_name xilinx_ps_wizard
 create_bd_design $design_name
 
+# Create interface ports
+set DDR [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:ddrx_rtl:1.0 DDR ]
+set FIXED_IO [ create_bd_intf_port -mode Master -vlnv xilinx.com:display_processing_system7:fixedio_rtl:1.0 FIXED_IO ]
+
 # Create ports
 set ps_tms_o [ create_bd_port -dir O ps_tms_o ]
 set ps_gpio_i [ create_bd_port -dir I -from 1 -to 0 ps_gpio_i ]

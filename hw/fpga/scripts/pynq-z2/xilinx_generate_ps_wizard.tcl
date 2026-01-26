@@ -4,12 +4,6 @@ set_property BOARD_PART tul.com.tw:pynq-z2:part0:1.0 [current_project]
 set design_name xilinx_ps_wizard
 create_bd_design $design_name
 
-# Create interface ports
-set DDR [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:ddrx_rtl:1.0 DDR ]
-
-set FIXED_IO [ create_bd_intf_port -mode Master -vlnv xilinx.com:display_processing_system7:fixedio_rtl:1.0 FIXED_IO ]
-
-
 # Create ports
 set ps_tms_o [ create_bd_port -dir O ps_tms_o ]
 set ps_gpio_i [ create_bd_port -dir I -from 1 -to 0 ps_gpio_i ]
@@ -30,7 +24,7 @@ set_property -dict [list \
   CONFIG.PCW_ACT_DCI_PERIPHERAL_FREQMHZ {10.096154} \
   CONFIG.PCW_ACT_ENET0_PERIPHERAL_FREQMHZ {125.000000} \
   CONFIG.PCW_ACT_ENET1_PERIPHERAL_FREQMHZ {10.000000} \
-  CONFIG.PCW_ACT_FPGA0_PERIPHERAL_FREQMHZ {1.000000} \
+  CONFIG.PCW_ACT_FPGA0_PERIPHERAL_FREQMHZ {5.000000} \
   CONFIG.PCW_ACT_FPGA1_PERIPHERAL_FREQMHZ {10.000000} \
   CONFIG.PCW_ACT_FPGA2_PERIPHERAL_FREQMHZ {10.000000} \
   CONFIG.PCW_ACT_FPGA3_PERIPHERAL_FREQMHZ {10.000000} \
@@ -58,7 +52,7 @@ set_property -dict [list \
   CONFIG.PCW_CAN1_PERIPHERAL_CLKSRC {External} \
   CONFIG.PCW_CAN_PERIPHERAL_CLKSRC {IO PLL} \
   CONFIG.PCW_CAN_PERIPHERAL_VALID {0} \
-  CONFIG.PCW_CLK0_FREQ {1000000} \
+  CONFIG.PCW_CLK0_FREQ {5000000} \
   CONFIG.PCW_CLK1_FREQ {10000000} \
   CONFIG.PCW_CLK2_FREQ {10000000} \
   CONFIG.PCW_CLK3_FREQ {10000000} \
@@ -173,6 +167,7 @@ set_property -dict [list \
   CONFIG.PCW_I2C_RESET_POLARITY {Active Low} \
   CONFIG.PCW_IMPORT_BOARD_PRESET {None} \
   CONFIG.PCW_INCLUDE_ACP_TRANS_CHECK {0} \
+  CONFIG.PCW_IRQ_F2P_INTR {1} \
   CONFIG.PCW_MIO_0_IOTYPE {LVCMOS 3.3V} \
   CONFIG.PCW_MIO_0_PULLUP {enabled} \
   CONFIG.PCW_MIO_0_SLEW {slow} \
@@ -385,7 +380,7 @@ set_property -dict [list \
   CONFIG.PCW_PACKAGE_NAME {clg400} \
   CONFIG.PCW_PCAP_PERIPHERAL_CLKSRC {IO PLL} \
   CONFIG.PCW_PCAP_PERIPHERAL_FREQMHZ {200} \
-  CONFIG.PCW_PERIPHERAL_BOARD_PRESET {None} \
+  CONFIG.PCW_PERIPHERAL_BOARD_PRESET {part0} \
   CONFIG.PCW_PLL_BYPASSMODE_ENABLE {0} \
   CONFIG.PCW_PRESET_BANK0_VOLTAGE {LVCMOS 3.3V} \
   CONFIG.PCW_PRESET_BANK1_VOLTAGE {LVCMOS 1.8V} \
@@ -533,7 +528,7 @@ set_property -dict [list \
   CONFIG.PCW_USE_DMA2 {0} \
   CONFIG.PCW_USE_DMA3 {0} \
   CONFIG.PCW_USE_EXPANDED_IOP {0} \
-  CONFIG.PCW_USE_FABRIC_INTERRUPT {0} \
+  CONFIG.PCW_USE_FABRIC_INTERRUPT {1} \
   CONFIG.PCW_USE_HIGH_OCM {0} \
   CONFIG.PCW_USE_M_AXI_GP0 {1} \
   CONFIG.PCW_USE_M_AXI_GP1 {0} \
@@ -598,6 +593,8 @@ connect_bd_net -net axi_jtag_tdi  [get_bd_pins axi_jtag/tdi] \
 [get_bd_ports ps_tdi_o]
 connect_bd_net -net axi_jtag_tms  [get_bd_pins axi_jtag/tms] \
 [get_bd_ports ps_tms_o]
+connect_bd_net -net axi_uartlite_interrupt  [get_bd_pins axi_uartlite/interrupt] \
+[get_bd_pins zynq_7_ps/IRQ_F2P]
 connect_bd_net -net axi_uartlite_tx  [get_bd_pins axi_uartlite/tx] \
 [get_bd_ports ps_uart_tx_o]
 connect_bd_net -net gpio2_io_i_0_1  [get_bd_ports ps_gpio_i] \

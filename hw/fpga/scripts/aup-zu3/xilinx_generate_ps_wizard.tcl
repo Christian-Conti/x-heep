@@ -142,8 +142,8 @@ MIO#GPIO1 MIO#GPIO1 MIO#GPIO1 MIO#GPIO1 MIO#GPIO1 MIO#GPIO1 MIO#GPIO1 MIO#USB 0#
   CONFIG.PSU__CRL_APB__PCAP_CTRL__ACT_FREQMHZ {187.499969} \
   CONFIG.PSU__CRL_APB__PCAP_CTRL__FREQMHZ {200} \
   CONFIG.PSU__CRL_APB__PCAP_CTRL__SRCSEL {IOPLL} \
-  CONFIG.PSU__CRL_APB__PL0_REF_CTRL__ACT_FREQMHZ {4.999999} \
-  CONFIG.PSU__CRL_APB__PL0_REF_CTRL__FREQMHZ {5} \
+  CONFIG.PSU__CRL_APB__PL0_REF_CTRL__ACT_FREQMHZ {9.999998} \
+  CONFIG.PSU__CRL_APB__PL0_REF_CTRL__FREQMHZ {10} \
   CONFIG.PSU__CRL_APB__PL0_REF_CTRL__SRCSEL {IOPLL} \
   CONFIG.PSU__CRL_APB__RPLL_CTRL__SRCSEL {PSS_REF_CLK} \
   CONFIG.PSU__CRL_APB__SDIO0_REF_CTRL__ACT_FREQMHZ {187.499969} \
@@ -292,6 +292,7 @@ Port;FD4A0000;FD4AFFFF;1|FPD;DPDMA;FD4C0000;FD4CFFFF;1|FPD;DDR_XMPU5_CFG;FD05000
   CONFIG.PSU__USE__M_AXI_GP2 {0} \
 ] $zynq_ultra_ps
 
+
 # Create instance: axi_uartlite, and set properties
 set axi_uartlite [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_uartlite:2.0 axi_uartlite ]
 
@@ -301,6 +302,7 @@ set_property -dict [list \
   CONFIG.NUM_MI {3} \
   CONFIG.NUM_SI {1} \
 ] $axi_smc
+
 
 # Create instance: rst_ps8_0_96M, and set properties
 set rst_ps8_0_96M [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 rst_ps8_0_96M ]
@@ -317,6 +319,7 @@ set_property -dict [list \
   CONFIG.GPIO_BOARD_INTERFACE {Custom} \
   CONFIG.USE_BOARD_FLOW {true} \
 ] $axi_gpio
+
 
 # Create interface connections
 connect_bd_intf_net -intf_net axi_smc_M00_AXI [get_bd_intf_pins axi_smc/M00_AXI] [get_bd_intf_pins axi_jtag/s_axi]

@@ -27,7 +27,18 @@ module xilinx_core_v_mini_mcu_wrapper
     inout logic clk_200mhz_p,
 `else
     inout logic clk_i,
+`endif
+
+    inout logic rst_i,
+
+    output logic rst_led_o,
+    output logic clk_led_o,
+
 `ifdef PS_ENABLE
+`ifndef FPGA_ZCU104
+`ifndef FPGA_ZCU102
+`ifndef FPGA_AUP_ZU3
+`ifndef FPGA_GENESYS2
     inout [14:0] DDR_addr,
     inout [2:0] DDR_ba,
     inout DDR_cas_n,
@@ -51,11 +62,9 @@ module xilinx_core_v_mini_mcu_wrapper
     inout FIXED_IO_ps_srstb,
 `endif
 `endif
-
-    inout logic rst_i,
-
-    output logic rst_led_o,
-    output logic clk_led_o,
+`endif
+`endif
+`endif
 
 `ifndef PS_ENABLE
     inout logic boot_select_i,
@@ -106,21 +115,21 @@ module xilinx_core_v_mini_mcu_wrapper
 );
 
   wire                               clk_gen;
-  logic [                      31:0] exit_value;
   wire                               rst_n;
+  logic [                      31:0] exit_value;
   logic [CLK_LED_COUNT_LENGTH - 1:0] clk_count;
 
 `ifdef PS_ENABLE
+  wire       exit_valid;
+
   wire [1:0] ps_x_heep_i;
   wire [3:0] ps_x_heep_o;
-  wire ps_tck;
-  wire ps_tdi;
-  wire ps_tdo;
-  wire ps_tms;
-  wire ps_uart_rx;
-  wire ps_uart_tx;
-
-  wire exit_valid;
+  wire       ps_tck;
+  wire       ps_tdi;
+  wire       ps_tdo;
+  wire       ps_tms;
+  wire       ps_uart_rx;
+  wire       ps_uart_tx;
 `endif
 
   // low active reset
@@ -167,19 +176,6 @@ module xilinx_core_v_mini_mcu_wrapper
       .CLK_IN1_D_0_clk_p(clk_100mhz_p),
       .clk_out1_0(clk_gen)
   );
-
-`ifdef PS_ENABLE
-  xilinx_ps_wizard_wrapper xilinx_ps_wizard_wrapper_i (
-      .ps_gpio_i(ps_x_heep_i),
-      .ps_gpio_o(ps_x_heep_o),
-      .ps_tck_o(ps_tck),
-      .ps_tdi_o(ps_tdi),
-      .ps_tdo_i(ps_tdo),
-      .ps_tms_o(ps_tms),
-      .ps_uart_rx_i(ps_uart_rx),
-      .ps_uart_tx_o(ps_uart_tx)
-  );
-`endif
 `elsif FPGA_GENESYS2
   xilinx_clk_wizard_wrapper xilinx_clk_wizard_wrapper_i (
       .CLK_IN1_D_0_clk_n(clk_200mhz_n),
@@ -191,13 +187,26 @@ module xilinx_core_v_mini_mcu_wrapper
       .clk_100MHz(clk_i),
       .clk_out1_0(clk_gen)
   );
-`else  // FPGA PYNQ-Z2
+`else  // FPGA_PYNQ
   xilinx_clk_wizard_wrapper xilinx_clk_wizard_wrapper_i (
       .clk_125MHz(clk_i),
       .clk_out1_0(clk_gen)
   );
+`endif
 
 `ifdef PS_ENABLE
+`ifdef FPGA_AUP_ZU3  // Zynq UltraScale+ MPSoC
+  xilinx_ps_wizard_wrapper xilinx_ps_wizard_wrapper_i (
+      .ps_gpio_i(ps_x_heep_i),
+      .ps_gpio_o(ps_x_heep_o),
+      .ps_tck_o(ps_tck),
+      .ps_tdi_o(ps_tdi),
+      .ps_tdo_i(ps_tdo),
+      .ps_tms_o(ps_tms),
+      .ps_uart_rx_i(ps_uart_rx),
+      .ps_uart_tx_o(ps_uart_tx)
+  );
+`else  // Zynq
   xilinx_ps_wizard_wrapper xilinx_ps_wizard_wrapper_i (
       .DDR_addr(DDR_addr),
       .DDR_ba(DDR_ba),

@@ -1,7 +1,3 @@
-// Copyright 2022 EPFL
-// Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
-// SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
-
 module xilinx_core_v_mini_mcu_wrapper
   import obi_pkg::*;
   import reg_pkg::*;
@@ -9,7 +5,7 @@ module xilinx_core_v_mini_mcu_wrapper
     parameter COREV_PULP           = 0,
     parameter FPU                  = 0,
     parameter ZFINX                = 0,
-    parameter X_EXT                = 0,  // eXtension interface in cv32e40x
+    parameter X_EXT                = 0,
     parameter CLK_LED_COUNT_LENGTH = 27
 ) (
 
@@ -35,6 +31,8 @@ module xilinx_core_v_mini_mcu_wrapper
     output logic clk_led_o,
 
 `ifdef PS_ENABLE
+    output logic spi_flash_sel_led_o,
+
 `ifndef FPGA_ZCU104
 `ifndef FPGA_ZCU102
 `ifndef FPGA_AUP_ZU3
@@ -86,12 +84,12 @@ module xilinx_core_v_mini_mcu_wrapper
     inout  logic exit_valid_o,
 
     inout logic [3:0] spi_flash_sd_io,
-    inout logic spi_flash_csb_o,
-    inout logic spi_flash_sck_o,
+    inout logic       spi_flash_csb_o,
+    inout logic       spi_flash_sck_o,
 
     inout logic [3:0] spi_sd_io,
-    inout logic spi_csb_o,
-    inout logic spi_sck_o,
+    inout logic       spi_csb_o,
+    inout logic       spi_sck_o,
 
     inout logic spi_slave_sck_io,
     inout logic spi_slave_cs_io,
@@ -100,7 +98,7 @@ module xilinx_core_v_mini_mcu_wrapper
 
     inout logic [3:0] spi2_sd_io,
     inout logic [1:0] spi2_csb_o,
-    inout logic spi2_sck_o,
+    inout logic       spi2_sck_o,
 
     inout logic i2c_scl_io,
     inout logic i2c_sda_io,
@@ -111,7 +109,6 @@ module xilinx_core_v_mini_mcu_wrapper
     inout logic i2s_sck_io,
     inout logic i2s_ws_io,
     inout logic i2s_sd_io
-
 );
 
   wire                               clk_gen;
@@ -123,16 +120,20 @@ module xilinx_core_v_mini_mcu_wrapper
   wire       exit_valid;
 
   wire [1:0] ps_x_heep_i;
-  wire [3:0] ps_x_heep_o;
+  wire [4:0] ps_x_heep_o;
   wire       ps_tck;
   wire       ps_tdi;
   wire       ps_tdo;
   wire       ps_tms;
   wire       ps_uart_rx;
   wire       ps_uart_tx;
+
+  (* KEEP = "TRUE" *)wire ps_spi_flash_cs;
+  (* KEEP = "TRUE" *)wire ps_spi_flash_sck;
+  (* KEEP = "TRUE" *)wire ps_spi_flash_mosi;
+  (* KEEP = "TRUE" *)wire ps_spi_flash_miso;
 `endif
 
-  // low active reset
 `ifdef FPGA_NEXYS
   assign rst_n = rst_i;
 `elsif FPGA_GENESYS2
@@ -141,21 +142,14 @@ module xilinx_core_v_mini_mcu_wrapper
   assign rst_n = !rst_i;
 `endif
 
-  // reset LED for debugging
   assign rst_led_o = rst_n;
-
-  // counter to blink an LED
   assign clk_led_o = clk_count[CLK_LED_COUNT_LENGTH-1];
 
-  always_ff @(posedge clk_gen or negedge rst_n) begin : clk_count_process
-    if (!rst_n) begin
-      clk_count <= '0;
-    end else begin
-      clk_count <= clk_count + 1;
-    end
+  always_ff @(posedge clk_gen or negedge rst_n) begin
+    if (!rst_n) clk_count <= '0;
+    else clk_count <= clk_count + 1;
   end
 
-  // eXtension Interface
   if_xif #() ext_if ();
 
 `ifdef FPGA_ZCU104
@@ -187,7 +181,7 @@ module xilinx_core_v_mini_mcu_wrapper
       .clk_100MHz(clk_i),
       .clk_out1_0(clk_gen)
   );
-`else  // FPGA_PYNQ
+`else
   xilinx_clk_wizard_wrapper xilinx_clk_wizard_wrapper_i (
       .clk_125MHz(clk_i),
       .clk_out1_0(clk_gen)
@@ -195,7 +189,7 @@ module xilinx_core_v_mini_mcu_wrapper
 `endif
 
 `ifdef PS_ENABLE
-`ifdef FPGA_AUP_ZU3  // Zynq UltraScale+ MPSoC
+`ifdef FPGA_AUP_ZU3
   xilinx_ps_wizard_wrapper xilinx_ps_wizard_wrapper_i (
       .ps_gpio_i(ps_x_heep_i),
       .ps_gpio_o(ps_x_heep_o),
@@ -204,9 +198,13 @@ module xilinx_core_v_mini_mcu_wrapper
       .ps_tdo_i(ps_tdo),
       .ps_tms_o(ps_tms),
       .ps_uart_rx_i(ps_uart_rx),
-      .ps_uart_tx_o(ps_uart_tx)
+      .ps_uart_tx_o(ps_uart_tx),
+      .ps_spi_flash_cs_o(ps_spi_flash_cs),
+      .ps_spi_flash_sck_o(ps_spi_flash_sck),
+      .ps_spi_flash_mosi_o(ps_spi_flash_mosi),
+      .ps_spi_flash_miso_i(ps_spi_flash_miso)
   );
-`else  // Zynq
+`else
   xilinx_ps_wizard_wrapper xilinx_ps_wizard_wrapper_i (
       .DDR_addr(DDR_addr),
       .DDR_ba(DDR_ba),
@@ -236,7 +234,11 @@ module xilinx_core_v_mini_mcu_wrapper
       .ps_tdo_i(ps_tdo),
       .ps_tms_o(ps_tms),
       .ps_uart_rx_i(ps_uart_rx),
-      .ps_uart_tx_o(ps_uart_tx)
+      .ps_uart_tx_o(ps_uart_tx),
+      .ps_spi_flash_cs_o(ps_spi_flash_cs),
+      .ps_spi_flash_sck_o(ps_spi_flash_sck),
+      .ps_spi_flash_mosi_o(ps_spi_flash_mosi),
+      .ps_spi_flash_miso_i(ps_spi_flash_miso)
   );
 `endif
 `endif
@@ -329,13 +331,13 @@ module xilinx_core_v_mini_mcu_wrapper
       .spi_slave_cs_io(spi_slave_cs_io),
       .spi_slave_miso_io(spi_slave_miso_io),
       .spi_slave_mosi_io(spi_slave_mosi_io),
+      .spi_flash_cs_0_io(spi_flash_csb_o),
+      .spi_flash_sck_io(spi_flash_sck_o),
       .spi_flash_sd_0_io(spi_flash_sd_io[0]),
       .spi_flash_sd_1_io(spi_flash_sd_io[1]),
       .spi_flash_sd_2_io(spi_flash_sd_io[2]),
       .spi_flash_sd_3_io(spi_flash_sd_io[3]),
-      .spi_flash_cs_0_io(spi_flash_csb_o),
       .spi_flash_cs_1_io(),
-      .spi_flash_sck_io(spi_flash_sck_o),
       .spi_sd_0_io(spi_sd_io[0]),
       .spi_sd_1_io(spi_sd_io[1]),
       .spi_sd_2_io(spi_sd_io[2]),
@@ -343,8 +345,8 @@ module xilinx_core_v_mini_mcu_wrapper
       .spi_cs_0_io(spi_csb_o),
       .spi_cs_1_io(),
       .spi_sck_io(spi_sck_o),
-      .i2c_scl_io,
-      .i2c_sda_io,
+      .i2c_scl_io(i2c_scl_io),
+      .i2c_sda_io(i2c_sda_io),
       .spi2_sd_0_io(spi2_sd_io[0]),
       .spi2_sd_1_io(spi2_sd_io[1]),
       .spi2_sd_2_io(spi2_sd_io[2]),
@@ -352,8 +354,8 @@ module xilinx_core_v_mini_mcu_wrapper
       .spi2_cs_0_io(spi2_csb_o[0]),
       .spi2_cs_1_io(spi2_csb_o[1]),
       .spi2_sck_io(spi2_sck_o),
-      .pdm2pcm_clk_io,
-      .pdm2pcm_pdm_io,
+      .pdm2pcm_clk_io(pdm2pcm_clk_io),
+      .pdm2pcm_pdm_io(pdm2pcm_pdm_io),
       .i2s_sck_io(i2s_sck_io),
       .i2s_ws_io(i2s_ws_io),
       .i2s_sd_io(i2s_sd_io),
@@ -372,6 +374,46 @@ module xilinx_core_v_mini_mcu_wrapper
   assign ps_x_heep_i[1] = exit_value[0];
 
   assign exit_valid_o   = exit_valid;
-`endif
 
+  // SPI flash mux hooks (PS/X-HEEP)
+  (* DONT_TOUCH = "TRUE" *)
+  LUT1 #(
+      .INIT(2'b10)
+  ) u_keep_ps_spi_flash_sel (
+      .I0(ps_x_heep_o[4]),
+      .O ()
+  );
+
+  (* DONT_TOUCH = "TRUE" *)
+  LUT1 #(
+      .INIT(2'b10)
+  ) u_keep_ps_spi_flash_cs (
+      .I0(ps_spi_flash_cs),
+      .O ()
+  );
+
+  (* DONT_TOUCH = "TRUE" *)
+  LUT1 #(
+      .INIT(2'b10)
+  ) u_keep_ps_spi_flash_sck (
+      .I0(ps_spi_flash_sck),
+      .O ()
+  );
+
+  (* DONT_TOUCH = "TRUE" *)
+  LUT1 #(
+      .INIT(2'b10)
+  ) u_keep_ps_spi_flash_mosi (
+      .I0(ps_spi_flash_mosi),
+      .O ()
+  );
+
+  (* DONT_TOUCH = "TRUE" *)
+  LUT1 #(
+      .INIT(2'b10)
+  ) u_keep_ps_spi_flash_miso (
+      .I0(ps_spi_flash_miso),
+      .O ()
+  );
+`endif
 endmodule

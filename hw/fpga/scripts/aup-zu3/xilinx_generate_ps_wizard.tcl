@@ -15,8 +15,12 @@ set ps_tdi_o [ create_bd_port -dir O ps_tdi_o ]
 set ps_tms_o [ create_bd_port -dir O ps_tms_o ]
 set ps_tck_o [ create_bd_port -dir O ps_tck_o ]
 set ps_tdo_i [ create_bd_port -dir I ps_tdo_i ]
-set ps_gpio_o [ create_bd_port -dir O -from 3 -to 0 ps_gpio_o ]
 set ps_gpio_i [ create_bd_port -dir I -from 1 -to 0 ps_gpio_i ]
+set ps_gpio_o [ create_bd_port -dir O -from 4 -to 0 ps_gpio_o ]
+set ps_spi_flash_cs_o [ create_bd_port -dir O -from 0 -to 0 ps_spi_flash_cs_o ]
+set ps_spi_flash_mosi_o [ create_bd_port -dir O ps_spi_flash_mosi_o ]
+set ps_spi_flash_sck_o [ create_bd_port -dir O ps_spi_flash_sck_o ]
+set ps_spi_flash_miso_i [ create_bd_port -dir I ps_spi_flash_miso_i ]
 
 # Create instance: axi_jtag, and set properties
 set axi_jtag [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_jtag:1.0 axi_jtag ]
@@ -256,6 +260,12 @@ Port;FD4A0000;FD4AFFFF;1|FPD;DPDMA;FD4C0000;FD4CFFFF;1|FPD;DDR_XMPU5_CFG;FD05000
    CONFIG.PSU__SD0__PERIPHERAL__ENABLE {1} \
    CONFIG.PSU__SD0__PERIPHERAL__IO {MIO 13 .. 16 21 22} \
    CONFIG.PSU__SD0__SLOT_TYPE {SD 2.0} \
+   CONFIG.PSU__SD1__CLK_100_SDR_OTAP_DLY {0x3} \
+   CONFIG.PSU__SD1__CLK_200_SDR_OTAP_DLY {0x3} \
+   CONFIG.PSU__SD1__CLK_50_DDR_ITAP_DLY {0x3D} \
+   CONFIG.PSU__SD1__CLK_50_DDR_OTAP_DLY {0x4} \
+   CONFIG.PSU__SD1__CLK_50_SDR_ITAP_DLY {0x15} \
+   CONFIG.PSU__SD1__CLK_50_SDR_OTAP_DLY {0x5} \
    CONFIG.PSU__SD1__PERIPHERAL__ENABLE {0} \
    CONFIG.PSU__SPI0__PERIPHERAL__ENABLE {0} \
    CONFIG.PSU__SPI1__PERIPHERAL__ENABLE {0} \
@@ -299,7 +309,7 @@ set axi_uartlite [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_uartlite:2.0 
 # Create instance: axi_smc, and set properties
 set axi_smc [ create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect:1.0 axi_smc ]
 set_property -dict [list \
-   CONFIG.NUM_MI {3} \
+   CONFIG.NUM_MI {4} \
    CONFIG.NUM_SI {1} \
 ] $axi_smc
 
@@ -313,7 +323,7 @@ set_property -dict [list \
    CONFIG.C_ALL_INPUTS_2 {1} \
    CONFIG.C_ALL_OUTPUTS {1} \
    CONFIG.C_GPIO2_WIDTH {2} \
-   CONFIG.C_GPIO_WIDTH {4} \
+   CONFIG.C_GPIO_WIDTH {5} \
    CONFIG.C_IS_DUAL {1} \
    CONFIG.GPIO2_BOARD_INTERFACE {Custom} \
    CONFIG.GPIO_BOARD_INTERFACE {Custom} \
@@ -323,14 +333,20 @@ set_property -dict [list \
 
 # Create instance: ilconcat_0, and set properties
 set ilconcat_0 [ create_bd_cell -type inline_hdl -vlnv xilinx.com:inline_hdl:ilconcat:1.0 ilconcat_0 ]
+set_property CONFIG.NUM_PORTS {3} $ilconcat_0
+
 
 # Create instance: ilconstant_0, and set properties
 set ilconstant_0 [ create_bd_cell -type inline_hdl -vlnv xilinx.com:inline_hdl:ilconstant:1.0 ilconstant_0 ]
+
+# Create instance: axi_quad_spi, and set properties
+set axi_quad_spi [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_quad_spi:3.2 axi_quad_spi ]
 
 # Create interface connections
 connect_bd_intf_net -intf_net axi_smc_M00_AXI [get_bd_intf_pins axi_smc/M00_AXI] [get_bd_intf_pins axi_jtag/s_axi]
 connect_bd_intf_net -intf_net axi_smc_M01_AXI [get_bd_intf_pins axi_smc/M01_AXI] [get_bd_intf_pins axi_uartlite/S_AXI]
 connect_bd_intf_net -intf_net axi_smc_M02_AXI [get_bd_intf_pins axi_smc/M02_AXI] [get_bd_intf_pins axi_gpio/S_AXI]
+connect_bd_intf_net -intf_net axi_smc_M03_AXI [get_bd_intf_pins axi_smc/M03_AXI] [get_bd_intf_pins axi_quad_spi/AXI_LITE]
 connect_bd_intf_net -intf_net zynq_ultra_ps_M_AXI_HPM0_FPD [get_bd_intf_pins zynq_ultra_ps/M_AXI_HPM0_FPD] [get_bd_intf_pins axi_smc/S00_AXI]
 
 # Create port connections
@@ -342,6 +358,14 @@ connect_bd_net -net axi_jtag_tdi  [get_bd_pins axi_jtag/tdi] \
 [get_bd_ports ps_tdi_o]
 connect_bd_net -net axi_jtag_tms  [get_bd_pins axi_jtag/tms] \
 [get_bd_ports ps_tms_o]
+connect_bd_net -net axi_quad_spi_0_io0_o  [get_bd_pins axi_quad_spi/io0_o] \
+[get_bd_ports ps_spi_flash_mosi_o]
+connect_bd_net -net axi_quad_spi_0_ip2intc_irpt  [get_bd_pins axi_quad_spi/ip2intc_irpt] \
+[get_bd_pins ilconcat_0/In2]
+connect_bd_net -net axi_quad_spi_0_sck_o  [get_bd_pins axi_quad_spi/sck_o] \
+[get_bd_ports ps_spi_flash_sck_o]
+connect_bd_net -net axi_quad_spi_0_ss_o  [get_bd_pins axi_quad_spi/ss_o] \
+[get_bd_ports ps_spi_flash_cs_o]
 connect_bd_net -net axi_uartlite_0_tx  [get_bd_pins axi_uartlite/tx] \
 [get_bd_ports ps_uart_tx_o]
 connect_bd_net -net axi_uartlite_interrupt  [get_bd_pins axi_uartlite/interrupt] \
@@ -352,11 +376,14 @@ connect_bd_net -net ilconcat_0_dout  [get_bd_pins ilconcat_0/dout] \
 [get_bd_pins zynq_ultra_ps/pl_ps_irq0]
 connect_bd_net -net ilconstant_0_dout  [get_bd_pins ilconstant_0/dout] \
 [get_bd_pins ilconcat_0/In0]
+connect_bd_net -net io1_i_0_1  [get_bd_ports ps_spi_flash_miso_i] \
+[get_bd_pins axi_quad_spi/io1_i]
 connect_bd_net -net rst_ps8_0_96M_peripheral_aresetn  [get_bd_pins rst_ps8_0_96M/peripheral_aresetn] \
 [get_bd_pins axi_jtag/s_axi_aresetn] \
 [get_bd_pins axi_smc/aresetn] \
 [get_bd_pins axi_uartlite/s_axi_aresetn] \
-[get_bd_pins axi_gpio/s_axi_aresetn]
+[get_bd_pins axi_gpio/s_axi_aresetn] \
+[get_bd_pins axi_quad_spi/s_axi_aresetn]
 connect_bd_net -net rx_0_1  [get_bd_ports ps_uart_rx_i] \
 [get_bd_pins axi_uartlite/rx]
 connect_bd_net -net tdo_0_1  [get_bd_ports ps_tdo_i] \
@@ -367,13 +394,16 @@ connect_bd_net -net zynq_ultra_ps_pl_clk0  [get_bd_pins zynq_ultra_ps/pl_clk0] \
 [get_bd_pins rst_ps8_0_96M/slowest_sync_clk] \
 [get_bd_pins axi_uartlite/s_axi_aclk] \
 [get_bd_pins zynq_ultra_ps/maxihpm0_fpd_aclk] \
-[get_bd_pins axi_gpio/s_axi_aclk]
+[get_bd_pins axi_gpio/s_axi_aclk] \
+[get_bd_pins axi_quad_spi/s_axi_aclk] \
+[get_bd_pins axi_quad_spi/ext_spi_clk]
 connect_bd_net -net zynq_ultra_ps_pl_resetn0  [get_bd_pins zynq_ultra_ps/pl_resetn0] \
 [get_bd_pins rst_ps8_0_96M/ext_reset_in]
 
 # Create address segments
 assign_bd_address -offset 0xA0020000 -range 0x00010000 -with_name SEG_axi_gpio_0_Reg -target_address_space [get_bd_addr_spaces zynq_ultra_ps/Data] [get_bd_addr_segs axi_gpio/S_AXI/Reg] -force
 assign_bd_address -offset 0xA0000000 -range 0x00010000 -target_address_space [get_bd_addr_spaces zynq_ultra_ps/Data] [get_bd_addr_segs axi_jtag/s_axi/reg0] -force
+assign_bd_address -offset 0xA0030000 -range 0x00010000 -with_name SEG_axi_quad_spi_0_Reg -target_address_space [get_bd_addr_spaces zynq_ultra_ps/Data] [get_bd_addr_segs axi_quad_spi/AXI_LITE/Reg] -force
 assign_bd_address -offset 0xA0010000 -range 0x00010000 -with_name SEG_axi_uartlite_0_Reg -target_address_space [get_bd_addr_spaces zynq_ultra_ps/Data] [get_bd_addr_segs axi_uartlite/S_AXI/Reg] -force
 
 validate_bd_design

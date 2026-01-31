@@ -13,12 +13,15 @@ set FIXED_IO [ create_bd_intf_port -mode Master -vlnv xilinx.com:display_process
 # Create ports
 set ps_tms_o [ create_bd_port -dir O ps_tms_o ]
 set ps_gpio_i [ create_bd_port -dir I -from 1 -to 0 ps_gpio_i ]
-set ps_gpio_o [ create_bd_port -dir O -from 3 -to 0 ps_gpio_o ]
 set ps_uart_tx_o [ create_bd_port -dir O ps_uart_tx_o ]
 set ps_tdi_o [ create_bd_port -dir O ps_tdi_o ]
 set ps_tdo_i [ create_bd_port -dir I ps_tdo_i ]
 set ps_tck_o [ create_bd_port -dir O ps_tck_o ]
 set ps_uart_rx_i [ create_bd_port -dir I ps_uart_rx_i ]
+set ps_gpio_o [ create_bd_port -dir O -from 4 -to 0 ps_gpio_o ]
+set ps_spi_flash_cs_o [ create_bd_port -dir O -from 0 -to 0 ps_spi_flash_cs_o ]
+set ps_spi_flash_mosi_o [ create_bd_port -dir O ps_spi_flash_mosi_o ]
+set ps_spi_flash_sck_o [ create_bd_port -dir O ps_spi_flash_sck_o ]
 
 # Create instance: zynq_7_ps, and set properties
 set zynq_7_ps [ create_bd_cell -type ip -vlnv xilinx.com:ip:processing_system7:5.5 zynq_7_ps ]
@@ -571,21 +574,10 @@ set axi_uartlite [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_uartlite:2.0 
 # Create instance: axi_jtag, and set properties
 set axi_jtag [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_jtag:1.0 axi_jtag ]
 
-# Create instance: axi_gpio, and set properties
-set axi_gpio [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_gpio:2.0 axi_gpio ]
-set_property -dict [list \
-   CONFIG.C_ALL_INPUTS_2 {1} \
-   CONFIG.C_ALL_OUTPUTS {1} \
-   CONFIG.C_GPIO2_WIDTH {2} \
-   CONFIG.C_GPIO_WIDTH {4} \
-   CONFIG.C_IS_DUAL {1} \
-] $axi_gpio
-
-
 # Create instance: axi_smc, and set properties
 set axi_smc [ create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect:1.0 axi_smc ]
 set_property -dict [list \
-   CONFIG.NUM_MI {3} \
+   CONFIG.NUM_MI {4} \
    CONFIG.NUM_SI {1} \
 ] $axi_smc
 
@@ -595,22 +587,41 @@ set rst_zynq_7_ps_1M [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_rese
 
 # Create instance: ilconcat_0, and set properties
 set ilconcat_0 [ create_bd_cell -type inline_hdl -vlnv xilinx.com:inline_hdl:ilconcat:1.0 ilconcat_0 ]
+set_property CONFIG.NUM_PORTS {3} $ilconcat_0
+
 
 # Create instance: ilconstant_0, and set properties
 set ilconstant_0 [ create_bd_cell -type inline_hdl -vlnv xilinx.com:inline_hdl:ilconstant:1.0 ilconstant_0 ]
 set_property CONFIG.CONST_VAL {0} $ilconstant_0
 
 
+# Create instance: axi_gpio_0, and set properties
+set axi_gpio_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_gpio:2.0 axi_gpio_0 ]
+set_property -dict [list \
+   CONFIG.C_ALL_INPUTS_2 {1} \
+   CONFIG.C_ALL_OUTPUTS {1} \
+   CONFIG.C_GPIO2_WIDTH {2} \
+   CONFIG.C_GPIO_WIDTH {5} \
+   CONFIG.C_IS_DUAL {1} \
+] $axi_gpio_0
+
+
+# Create instance: axi_quad_spi_0, and set properties
+set axi_quad_spi_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_quad_spi:3.2 axi_quad_spi_0 ]
+set_property CONFIG.C_USE_STARTUP {0} $axi_quad_spi_0
+
+
 # Create interface connections
-connect_bd_intf_net -intf_net axi_smc_M00_AXI [get_bd_intf_pins axi_smc/M00_AXI] [get_bd_intf_pins axi_gpio/S_AXI]
+connect_bd_intf_net -intf_net axi_smc_M00_AXI [get_bd_intf_pins axi_smc/M00_AXI] [get_bd_intf_pins axi_gpio_0/S_AXI]
 connect_bd_intf_net -intf_net axi_smc_M01_AXI [get_bd_intf_pins axi_smc/M01_AXI] [get_bd_intf_pins axi_jtag/s_axi]
 connect_bd_intf_net -intf_net axi_smc_M02_AXI [get_bd_intf_pins axi_smc/M02_AXI] [get_bd_intf_pins axi_uartlite/S_AXI]
+connect_bd_intf_net -intf_net axi_smc_M03_AXI [get_bd_intf_pins axi_smc/M03_AXI] [get_bd_intf_pins axi_quad_spi_0/AXI_LITE]
 connect_bd_intf_net -intf_net processing_system7_0_DDR [get_bd_intf_ports DDR] [get_bd_intf_pins zynq_7_ps/DDR]
 connect_bd_intf_net -intf_net processing_system7_0_FIXED_IO [get_bd_intf_ports FIXED_IO] [get_bd_intf_pins zynq_7_ps/FIXED_IO]
 connect_bd_intf_net -intf_net zynq_7_ps_M_AXI_GP0 [get_bd_intf_pins zynq_7_ps/M_AXI_GP0] [get_bd_intf_pins axi_smc/S00_AXI]
 
 # Create port connections
-connect_bd_net -net axi_gpio_gpio_io_o  [get_bd_pins axi_gpio/gpio_io_o] \
+connect_bd_net -net axi_gpio_0_gpio_io_o  [get_bd_pins axi_gpio_0/gpio_io_o] \
 [get_bd_ports ps_gpio_o]
 connect_bd_net -net axi_jtag_tck  [get_bd_pins axi_jtag/tck] \
 [get_bd_ports ps_tck_o]
@@ -618,21 +629,30 @@ connect_bd_net -net axi_jtag_tdi  [get_bd_pins axi_jtag/tdi] \
 [get_bd_ports ps_tdi_o]
 connect_bd_net -net axi_jtag_tms  [get_bd_pins axi_jtag/tms] \
 [get_bd_ports ps_tms_o]
+connect_bd_net -net axi_quad_spi_0_io0_o  [get_bd_pins axi_quad_spi_0/io0_o] \
+[get_bd_ports ps_spi_flash_mosi_o]
+connect_bd_net -net axi_quad_spi_0_ip2intc_irpt  [get_bd_pins axi_quad_spi_0/ip2intc_irpt] \
+[get_bd_pins ilconcat_0/In2]
+connect_bd_net -net axi_quad_spi_0_sck_o  [get_bd_pins axi_quad_spi_0/sck_o] \
+[get_bd_ports ps_spi_flash_sck_o]
+connect_bd_net -net axi_quad_spi_0_ss_o  [get_bd_pins axi_quad_spi_0/ss_o] \
+[get_bd_ports ps_spi_flash_cs_o]
 connect_bd_net -net axi_uartlite_interrupt  [get_bd_pins axi_uartlite/interrupt] \
 [get_bd_pins ilconcat_0/In1]
 connect_bd_net -net axi_uartlite_tx  [get_bd_pins axi_uartlite/tx] \
 [get_bd_ports ps_uart_tx_o]
-connect_bd_net -net gpio2_io_i_0_1  [get_bd_ports ps_gpio_i] \
-[get_bd_pins axi_gpio/gpio2_io_i]
 connect_bd_net -net ilconcat_0_dout  [get_bd_pins ilconcat_0/dout] \
 [get_bd_pins zynq_7_ps/IRQ_F2P]
 connect_bd_net -net ilconstant_0_dout  [get_bd_pins ilconstant_0/dout] \
 [get_bd_pins ilconcat_0/In0]
+connect_bd_net -net ps_gpio_i_1  [get_bd_ports ps_gpio_i] \
+[get_bd_pins axi_gpio_0/gpio2_io_i]
 connect_bd_net -net rst_zynq_7_ps_1M_peripheral_aresetn  [get_bd_pins rst_zynq_7_ps_1M/peripheral_aresetn] \
-[get_bd_pins axi_gpio/s_axi_aresetn] \
 [get_bd_pins axi_smc/aresetn] \
 [get_bd_pins axi_jtag/s_axi_aresetn] \
-[get_bd_pins axi_uartlite/s_axi_aresetn]
+[get_bd_pins axi_uartlite/s_axi_aresetn] \
+[get_bd_pins axi_gpio_0/s_axi_aresetn] \
+[get_bd_pins axi_quad_spi_0/s_axi_aresetn]
 connect_bd_net -net rx_0_1  [get_bd_ports ps_uart_rx_i] \
 [get_bd_pins axi_uartlite/rx]
 connect_bd_net -net tdo_0_1  [get_bd_ports ps_tdo_i] \
@@ -640,16 +660,19 @@ connect_bd_net -net tdo_0_1  [get_bd_ports ps_tdo_i] \
 connect_bd_net -net zynq_7_ps_FCLK_CLK0  [get_bd_pins zynq_7_ps/FCLK_CLK0] \
 [get_bd_pins zynq_7_ps/M_AXI_GP0_ACLK] \
 [get_bd_pins axi_smc/aclk] \
-[get_bd_pins axi_gpio/s_axi_aclk] \
 [get_bd_pins rst_zynq_7_ps_1M/slowest_sync_clk] \
 [get_bd_pins axi_jtag/s_axi_aclk] \
-[get_bd_pins axi_uartlite/s_axi_aclk]
+[get_bd_pins axi_uartlite/s_axi_aclk] \
+[get_bd_pins axi_gpio_0/s_axi_aclk] \
+[get_bd_pins axi_quad_spi_0/ext_spi_clk] \
+[get_bd_pins axi_quad_spi_0/s_axi_aclk]
 connect_bd_net -net zynq_7_ps_FCLK_RESET0_N  [get_bd_pins zynq_7_ps/FCLK_RESET0_N] \
 [get_bd_pins rst_zynq_7_ps_1M/ext_reset_in]
 
 # Create address segments
-assign_bd_address -offset 0x41200000 -range 0x00010000 -target_address_space [get_bd_addr_spaces zynq_7_ps/Data] [get_bd_addr_segs axi_gpio/S_AXI/Reg] -force
+assign_bd_address -offset 0x41200000 -range 0x00010000 -target_address_space [get_bd_addr_spaces zynq_7_ps/Data] [get_bd_addr_segs axi_gpio_0/S_AXI/Reg] -force
 assign_bd_address -offset 0x43C00000 -range 0x00010000 -target_address_space [get_bd_addr_spaces zynq_7_ps/Data] [get_bd_addr_segs axi_jtag/s_axi/reg0] -force
+assign_bd_address -offset 0x41E00000 -range 0x00010000 -target_address_space [get_bd_addr_spaces zynq_7_ps/Data] [get_bd_addr_segs axi_quad_spi_0/AXI_LITE/Reg] -force
 assign_bd_address -offset 0x42C00000 -range 0x00010000 -target_address_space [get_bd_addr_spaces zynq_7_ps/Data] [get_bd_addr_segs axi_uartlite/S_AXI/Reg] -force
 
 # Save and close block design

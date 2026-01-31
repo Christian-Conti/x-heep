@@ -53,10 +53,13 @@ filesets:
     
   ip-fpga-aup-zu3:
     files:
-    - scripts/aup-zu3/xilinx_generate_clk_wizard.tcl
-    - "PS_ENABLE ? (scripts/aup-zu3/xilinx_generate_ps_wizard.tcl)"
-    file_type: tclSource
-  
+    - scripts/aup-zu3/xilinx_generate_clk_wizard.tcl: { file_type: tclSource }
+    - "PS_ENABLE ? (scripts/aup-zu3/xilinx_generate_ps_wizard.tcl)": { file_type: tclSource }
+    - "PS_ENABLE ? (scripts/vivado/set_eco_hook.tcl)": { file_type: tclSource }
+    - "PS_ENABLE ? (scripts/vivado/eco_spi_flash_mux.tcl)": { file_type: user }
+
+
+
   ip-fpga-genesys2:
     files:
     - scripts/genesys2/xilinx_generate_clk_wizard.tcl

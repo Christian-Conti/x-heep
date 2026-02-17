@@ -8,11 +8,6 @@ MAKE	= make
 mkfile_path := $(shell dirname "$(realpath $(firstword $(MAKEFILE_LIST)))")
 $(info $$You are executing from: $(mkfile_path))
 
-# Helper variables for Make string manipulation
-empty :=
-space := $(empty) $(empty)
-comma := ,
-
 # Include the self-documenting tool
 export FILE_FOR_HELP=$(mkfile_path)/Makefile
 
@@ -46,58 +41,25 @@ VERILATOR_DIR     = $(FUSESOC_BUILD_DIR)/sim-verilator
 QUESTASIM_DIR     = $(FUSESOC_BUILD_DIR)/sim-modelsim
 
 # Project options are based on the app to be built (default - hello_world)
-PROJECT  ?= hello_world
+PROJECT ?= hello_world
 
 # Folder where the linker scripts are located
 LINK_FOLDER ?= $(mkfile_path)/sw/linker
 # Linker options are 'on_chip' (default),'flash_load','flash_exec','freertos'
-LINKER   ?= on_chip
+LINKER ?= on_chip
 
 # Target options are 'sim' (default) and 'pynq-z2' and 'nexys-a7-100t'
-TARGET   	?= sim
+TARGET ?= sim
 
 # Mcu-gen configuration files
 X_HEEP_CFG  ?= configs/general.hjson
-PADS_CFG ?= configs/pad_cfg.hjson
+PADS_CFG ?= configs/pad_cfg.py
 PYTHON_X_HEEP_CFG ?=
-# Cached mcu-gen xheep configuration
-XHEEP_CONFIG_CACHE ?= $(BUILD_DIR)/xheep_config_cache.pickle
 
 # MCU-Gen template files to generate
-MCU_GEN_TEMPLATES = \
-	hw/core-v-mini-mcu/include/core_v_mini_mcu_pkg.sv.tpl \
-	hw/core-v-mini-mcu/core_v_mini_mcu.sv.tpl \
-	hw/core-v-mini-mcu/system_bus.sv.tpl \
-	hw/core-v-mini-mcu/system_xbar.sv.tpl \
-	hw/core-v-mini-mcu/memory_subsystem.sv.tpl \
-	hw/core-v-mini-mcu/ao_peripheral_subsystem.sv.tpl \
-	hw/core-v-mini-mcu/peripheral_subsystem.sv.tpl \
-	hw/core-v-mini-mcu/cpu_subsystem.sv.tpl \
-	hw/system/x_heep_system.sv.tpl \
-	hw/system/pad_ring.sv.tpl \
-	hw/system/pad_control/data/pad_control.hjson.tpl \
-	hw/system/pad_control/rtl/pad_control.sv.tpl \
-	hw/ip/soc_ctrl/data/soc_ctrl.hjson.tpl \
-	hw/ip/power_manager/rtl/power_manager.sv.tpl \
-	hw/ip/power_manager/data/power_manager.hjson.tpl \
-	hw/ip/pdm2pcm/data/pdm2pcm.hjson.tpl \
-	hw/ip/pdm2pcm/rtl/pdm2pcm.sv.tpl \
-	hw/ip/pdm2pcm/rtl/pdm_core.sv.tpl \
-	hw/ip/dma/data/dma.hjson.tpl \
-	hw/ip/dma/data/dma_conf.svh.tpl \
-	hw/fpga/sram_wrapper.sv.tpl \
-	hw/fpga/scripts/generate_sram.tcl.tpl \
-	tb/tb_util.svh.tpl \
-	$(LINK_FOLDER)/link.ld.tpl \
-	$(LINK_FOLDER)/link_flash_load.ld.tpl \
-	$(LINK_FOLDER)/link_flash_exec.ld.tpl \
-	sw/device/lib/crt/crt0.S.tpl \
-	sw/device/lib/runtime/core_v_mini_mcu.h.tpl \
-	sw/device/lib/runtime/core_v_mini_mcu_memory.h.tpl \
-	sw/device/lib/drivers/power_manager/power_manager.h.tpl \
-	scripts/pnr/core-v-mini-mcu.upf.tpl \
-	scripts/pnr/core-v-mini-mcu.dc.upf.tpl \
-	util/profile/run_profile.sh.tpl
+MCU_GEN_TEMPLATES = $(shell find . \( -path './hw/vendor' -o -path './util' -o -path './test' \) -prune -o -name '*.tpl' -print)
+# Optionally, additional external template files can be provided to mcu-gen
+EXTERNAL_MCU_GEN_TEMPLATES ?= 
 
 # Compiler options are 'gcc' (default) and 'clang'
 COMPILER 		?= gcc
@@ -111,7 +73,7 @@ ARCH     		?= rv32imc_zicsr
 CLANG_LINKER_USE_LD ?= 0
 
 # Path relative from the location of sw/Makefile from which to fetch source files. The directory of that file is the default value.
-SOURCE 	 ?= $(".")
+SOURCE ?= $(".")
 
 # Simulation engines options are verilator (default) and questasim
 SIMULATOR ?= verilator
@@ -143,9 +105,9 @@ else
 endif
 
 # Area plot default configuration
-AREA_PLOT_RPT 		?= $(word 1, $(shell [ -d $(BUILD_DIR) ] && find $(BUILD_DIR) -type f -name "*area*.rpt" 2>/dev/null)) # path to the area report file
-AREA_PLOT_OUTDIR 	?= $(BUILD_DIR)/area-plot/ # output directory for the area plot
-AREA_PLOT_TOP 		?=# top level module to consider for the area plot (automatically infer)
+AREA_PLOT_RPT    ?= $(word 1, $(shell [ -d $(BUILD_DIR) ] && find $(BUILD_DIR) -type f -name "*area*.rpt" 2>/dev/null)) # path to the area report file
+AREA_PLOT_OUTDIR ?= $(BUILD_DIR)/area-plot/ # output directory for the area plot
+AREA_PLOT_TOP    ?=# top level module to consider for the area plot (automatically infer)
 
 # Export variables to sub-makefiles
 export
@@ -164,8 +126,7 @@ conda:
 ## @param X_HEEP_CFG=[configs/general.hjson(default),<path-to-config-file>]
 ## @param PYTHON_X_HEEP_CFG=[configs/general.py(default),<path-to-config-file>]
 mcu-gen:
-	$(PYTHON) util/mcu_gen.py --cached_path $(XHEEP_CONFIG_CACHE) --config $(X_HEEP_CFG) --python_config $(PYTHON_X_HEEP_CFG) --pads_cfg $(PADS_CFG) --cpu $(CPU) --bus $(BUS) --memorybanks $(MEMORY_BANKS) --memorybanks_il $(MEMORY_BANKS_IL) --external_domains $(EXTERNAL_DOMAINS)
-	$(PYTHON) util/mcu_gen.py --cached_path $(XHEEP_CONFIG_CACHE) --cached --outtpl "$(subst $(space),$(comma),$(MCU_GEN_TEMPLATES))"
+	$(PYTHON) util/mcu_gen.py --config $(X_HEEP_CFG) --python_config $(PYTHON_X_HEEP_CFG) --pads_cfg $(PADS_CFG) --outtpl "$(MCU_GEN_TEMPLATES)" --externaltpl "$(EXTERNAL_MCU_GEN_TEMPLATES)" --cpu $(CPU) --bus $(BUS) --memorybanks $(MEMORY_BANKS) --memorybanks_il $(MEMORY_BANKS_IL) --external_domains $(EXTERNAL_DOMAINS)
 	bash -c "cd hw/ip/soc_ctrl; source soc_ctrl_gen.sh; cd ../../../"
 	bash -c "cd hw/ip/power_manager; source power_manager_gen.sh; cd ../../../"
 	bash -c "cd hw/ip/pdm2pcm; source pdm2pcm_gen.sh; cd ../../../"
@@ -189,7 +150,9 @@ format-python:
 	$(PYTHON) -m black util/mcu_gen.py
 	$(PYTHON) -m black util/waiver-gen.py
 	$(PYTHON) -m black util/c_gen.py
+	$(PYTHON) -m black configs
 	$(PYTHON) -m black test/test_x_heep_gen
+	$(PYTHON) -m black configs
 
 ## @section APP FW Build
 
@@ -211,7 +174,7 @@ app: clean-app
 	echo "\033[0;31mI would start by checking b) or c) if I were you!\033[0m"; \
 	exit 1; \
 	}
-	@python scripts/building/mem_usage.py
+	@$(PYTHON) scripts/building/mem_usage.py
 
 ## Just list the different application names available
 app-list:
@@ -351,17 +314,17 @@ gdb_connect:
 test:
 	$(MAKE) mcu-gen X_HEEP_CFG=configs/ci.hjson
 	$(RM) test/*.log
-	python3 test/test_apps/test_apps.py $(TEST_FLAGS) 2>&1 | tee test/test_apps/test_apps.log
+	$(PYTHON) test/test_apps/test_apps.py $(TEST_FLAGS) 2>&1 | tee test/test_apps/test_apps.log
 	@echo "You can also find the output in test/test_apps/test_apps.log"
-	python3 test/test_x_heep_gen/test_peripherals.py
+	$(PYTHON) test/test_x_heep_gen/test_peripherals.py
 	@echo "You can also find the peripheral test outputs in test/test_x_heep_gen/outputs"
 
-.PHONY: test_kwargs
-test_kwargs:
-	$(MAKE) mcu-gen X_HEEP_CFG=configs/ci.hjson PADS_CFG=test/test_x_heep_gen/pads/pad_cfg.hjson
-	$(PYTHON) util/mcu_gen.py --cached_path $(XHEEP_CONFIG_CACHE) --cached --outtpl test/test_x_heep_gen/pads/output/kwargs_output.json.tpl
-	python3 test/test_x_heep_gen/pad_test.py
-
+## Compares two mcu-gen runs and lists the differences in the generated files. 
+## It can be used to manually check if a change in the configuration or in the mcu-gen code has an
+## effect on the generated files.
+.PHONY: compare-mcu-gen
+compare-mcu-gen:
+	$(PYTHON) test/test_x_heep_gen/compare_mcu_gen.py
 
 ## Builds the specified app, loads it into the programmer's flash and then opens picocom to see the output
 ## @param PROJECT=<folder_name_of_the_project_to_be_built>

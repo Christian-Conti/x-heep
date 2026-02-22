@@ -1,0 +1,28 @@
+diff --git a/hw/vendor/pulp_platform_common_cells/src/rr_arb_tree.sv b/hw/vendor/pulp_platform_common_cells/src/rr_arb_tree.sv
+index 15d9bb0..e0719a6 100644
+--- a/hw/vendor/pulp_platform_common_cells/src/rr_arb_tree.sv
++++ b/hw/vendor/pulp_platform_common_cells/src/rr_arb_tree.sv
+@@ -303,7 +303,6 @@ module rr_arb_tree #(
+       end
+     end
+ 
+-<<<<<<< HEAD
+     // pragma translate_off
+     `ifndef VERILATOR
+     `ifndef XILINX_SIMULATOR
+@@ -313,12 +312,13 @@ module rr_arb_tree #(
+       assert(!(LockIn && ExtPrio))
+         else $fatal(1,"Cannot use LockIn feature together with external ExtPrio.");
+     end
+-=======
++    `endif
++    `endif
++
+     `ifndef COMMON_CELLS_ASSERTS_OFF
+     `ASSERT_INIT(numin_0, NumIn, "Input must be at least one element wide.")
+     `ASSERT_INIT(lockin_and_extprio, !(LockIn && ExtPrio),
+                  "Cannot use LockIn feature together with external ExtPrio.")
+->>>>>>> main
+ 
+     `ASSERT(hot_one, $onehot0(gnt_o), clk_i, !rst_ni || flush_i,
+             "Grant signal must be hot1 or zero.")

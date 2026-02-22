@@ -111,15 +111,6 @@ module rr_arb_tree #(
   output idx_t                idx_o
 );
 
-  // pragma translate_off
-  `ifndef VERILATOR
-  `ifndef XILINX_SIMULATOR
-  // Default SVA reset
-  default disable iff (!rst_ni || flush_i);
-  `endif
-  `endif
-  // pragma translate_on
-
   // just pass through in this corner case
   if (NumIn == unsigned'(1)) begin : gen_pass_through
     assign req_o    = req_i[0];
@@ -302,18 +293,6 @@ module rr_arb_tree #(
         //////////////////////////////////////////////////////////////
       end
     end
-
-    // pragma translate_off
-    `ifndef VERILATOR
-    `ifndef XILINX_SIMULATOR
-    initial begin : p_assert
-      assert(NumIn)
-        else $fatal(1, "Input must be at least one element wide.");
-      assert(!(LockIn && ExtPrio))
-        else $fatal(1,"Cannot use LockIn feature together with external ExtPrio.");
-    end
-    `endif
-    `endif
 
     `ifndef COMMON_CELLS_ASSERTS_OFF
     `ASSERT_INIT(numin_0, NumIn, "Input must be at least one element wide.")

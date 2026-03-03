@@ -59,7 +59,12 @@ PADS_CFG ?= configs/pad_cfg.py
 PYTHON_X_HEEP_CFG ?=
 
 # MCU-Gen template files to generate
-MCU_GEN_TEMPLATES = $(shell find . \( -path './hw/vendor' -o -path './util' -o -path './test' \) -prune -o -name '*.tpl' -print)
+MCU_GEN_TEMPLATES = $(shell find . \
+  \( -path './hw/vendor/*' ! -path './hw/vendor/xheep_dma*' -o \
+     -path './util/*' -o \
+     -path './test/*' \) -prune -o \
+  -name '*.tpl' -print)
+  
 # Optionally, additional external template files can be provided to mcu-gen
 EXTERNAL_MCU_GEN_TEMPLATES ?= 
 
@@ -133,7 +138,7 @@ mcu-gen:
 	bash -c "cd hw/ip/power_manager; source power_manager_gen.sh; cd ../../../"
 	bash -c "cd hw/ip/pdm2pcm; source pdm2pcm_gen.sh; cd ../../../"
 	bash -c "cd hw/system/pad_control; source pad_control_gen.sh; cd ../../../"
-	bash -c "cd hw/ip/dma; source dma_gen.sh; cd ../../../"
+	bash -c "cd hw/vendor/xheep_dma; source dma_gen.sh; cd ../../../"
 	bash -c "cd hw/ip/boot_rom; make clean; make all; cd ../../../"
 	$(MAKE) verible
 

@@ -76,14 +76,6 @@ module x_heep_system
 
     output logic [31:0] exit_value_o,
 
-    % if user_peripheral_domain.contains_peripheral('serial_link'):
-      //Serial Link
-      input  logic [serial_link_single_channel_reg_pkg::NumChannels-1:0]    ddr_rcv_clk_i,  
-      output logic [serial_link_single_channel_reg_pkg::NumChannels-1:0]    ddr_rcv_clk_o,
-      input  logic [serial_link_single_channel_reg_pkg::NumChannels-1:0][serial_link_minimum_axi_pkg::NumLanes-1:0] ddr_i,
-      output logic [serial_link_single_channel_reg_pkg::NumChannels-1:0][serial_link_minimum_axi_pkg::NumLanes-1:0] ddr_o,
-    %endif
-
     input logic [core_v_mini_mcu_pkg::DMA_CH_NUM-1:0] ext_dma_slot_tx_i,
     input logic [core_v_mini_mcu_pkg::DMA_CH_NUM-1:0] ext_dma_slot_rx_i,
     input logic [core_v_mini_mcu_pkg::DMA_CH_NUM-1:0] ext_dma_stop_i,
@@ -162,14 +154,7 @@ module x_heep_system
     .EXT_XBAR_NMASTER(EXT_XBAR_NMASTER),
     .AO_SPC_NUM(AO_SPC_NUM),
     .EXT_HARTS(EXT_HARTS)
-  ) core_v_mini_mcu_i (
-    % if user_peripheral_domain.contains_peripheral('serial_link'):
-      //Serial Link
-      .ddr_rcv_clk_i,  
-      .ddr_rcv_clk_o,
-      .ddr_i,
-      .ddr_o,
-    %endif    
+  ) core_v_mini_mcu_i (   
     // MCU pads
     .rst_ni(rst_ngen),
     % for pin in xheep.get_padring().get_connected_pins():
@@ -299,7 +284,7 @@ analog_signal_pads = [ pad for pad in xheep.get_padring().pad_list if any(isinst
   always_comb
   begin
     % for pin in pad.pins:
-      ${pin.rtl_name()}in_x = 1'b0;
+      ${pin.rtl_name()}in_x = ${"1'b1" if pin.attributes.get("active") == "low" else "1'b0"};
     % endfor
     unique case(pad_muxes[core_v_mini_mcu_pkg::PAD_${pad.name.upper()}])
       % for idx, pin in enumerate(pad.pins):

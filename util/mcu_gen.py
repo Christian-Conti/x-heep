@@ -83,20 +83,12 @@ def generate_xheep(args):
             raise SystemExit(sys.exc_info()[1])
 
     # Load pads HJSON configuration file
-    pad_ring = x_heep_gen.load_config.load_pad_cfg(pathlib.PurePath(str(args.pads_cfg)))
+    pad_ring = x_heep_gen.load_config.load_pad_cfg(
+        pathlib.PurePath(str(args.pads_cfg)), xheep
+    )
     if pad_ring is None:
         exit(f"Error loading pads configuration file: {args.pads_cfg}")
     xheep.set_padring(pad_ring)
-
-    if args.external_domains != None and args.external_domains != "":
-        external_domains = int(args.external_domains)
-    else:
-        external_domains = 0
-
-    if external_domains > 32:
-        exit(
-            "external_domains must be less than 32 instead of " + str(external_domains)
-        )
 
     try:
         has_spi_slave = 1 if config["debug"]["has_spi_slave"] == "yes" else 0
@@ -159,7 +151,6 @@ def generate_xheep(args):
 
     kwargs = {
         "xheep": xheep,
-        "external_domains": external_domains,
         "debug_start_address": debug_start_address,
         "debug_size_address": debug_size_address,
         "has_spi_slave": has_spi_slave,
@@ -237,14 +228,6 @@ def main():
         nargs="?",
         default="",
         help="Number of interleaved memory banks (default value from cfg file)",
-    )
-
-    parser.add_argument(
-        "--external_domains",
-        metavar="from 0 to 32",
-        nargs="?",
-        default="1",
-        help="Number of external domains",
     )
 
     parser.add_argument(

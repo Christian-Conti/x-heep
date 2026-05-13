@@ -17,7 +17,6 @@ module serial_link_xheep_wrapper
   import axi_pkg::*;
 #(
     parameter int MaxClkDiv = 32,
-    parameter int AddrWidth = 32,
     parameter int DataWidth = 32
 ) (
     input logic clk_i,
@@ -37,7 +36,7 @@ module serial_link_xheep_wrapper
 
 
     input logic [serial_link_minimum_axi_pkg::NumChannels-1:0] ddr_rcv_clk_i,
-    output logic [serial_link_minimum_axi_pkg::NumChannels-1:0] ddr_rcv_clk_o,
+    output logic [serial_link_minimum_axi_pkg::NumChannels-1:0] ddr_snd_clk_o,
     input  logic [serial_link_minimum_axi_pkg::NumChannels-1:0][serial_link_minimum_axi_pkg::NumLanes-1:0] ddr_i,
     output logic [serial_link_minimum_axi_pkg::NumChannels-1:0][serial_link_minimum_axi_pkg::NumLanes-1:0] ddr_o
 
@@ -50,9 +49,12 @@ module serial_link_xheep_wrapper
   serial_link_minimum_axi_pkg::axi_req_t fast_sl_req_O, axi_in_req, axi_lite_req;
   serial_link_minimum_axi_pkg::axi_resp_t fast_sl_rsp_O, axi_in_rsp, axi_lite_rsp;
 
+  // Transaltes the OBI request into the AXI request
+  // To allow transparent functionality of the SL and send data only
+  // The serial_link_minimum_axi_pkg parameters are used
   axi_lite_from_mem #(
-      .MemAddrWidth(AddrWidth),
-      .AxiAddrWidth(AddrWidth),
+      .MemAddrWidth(32'd32), // obi addr width
+      .AxiAddrWidth(serial_link_minimum_axi_pkg::AXI_ADDR_WIDTH),
       .DataWidth   (DataWidth),
       .MaxRequests (DataWidth),  // fifo size
       .axi_req_t   (serial_link_minimum_axi_pkg::axi_req_t),
@@ -85,8 +87,8 @@ module serial_link_xheep_wrapper
       // Slave AXI LITE port
       .slv_req_lite_i(axi_lite_req),
       .slv_resp_lite_o(axi_lite_rsp),
-      .slv_aw_cache_i(),
-      .slv_ar_cache_i(),
+      .slv_aw_cache_i('0),
+      .slv_ar_cache_i('0),
       .mst_req_o(axi_in_req),
       .mst_resp_i(axi_in_rsp)
   );
@@ -148,7 +150,7 @@ module serial_link_xheep_wrapper
         .cfg_req_i    (cfg_req_i),
         .cfg_rsp_o    (cfg_rsp_o),
         .ddr_rcv_clk_i(ddr_rcv_clk_i),
-        .ddr_rcv_clk_o(ddr_rcv_clk_o),
+        .ddr_rcv_clk_o(ddr_snd_clk_o),
         .ddr_i        (ddr_i),
         .ddr_o        (ddr_o),
         .isolated_i   (2'b0),
@@ -187,7 +189,7 @@ module serial_link_xheep_wrapper
         .cfg_req_i    (cfg_req_i),
         .cfg_rsp_o    (cfg_rsp_o),
         .ddr_rcv_clk_i(ddr_rcv_clk_i),
-        .ddr_rcv_clk_o(ddr_rcv_clk_o),
+        .ddr_rcv_clk_o(ddr_snd_clk_o),
         .ddr_i        (ddr_i),
         .ddr_o        (ddr_o),
         .isolated_i   (2'b0),

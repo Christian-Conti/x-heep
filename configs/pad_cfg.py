@@ -5,12 +5,13 @@
 # Author(s): Juan Sapriza, David Mallasen
 # Description: Pad configuration for X-HEEP
 
+from x_heep_gen.xheep import XHeep
 from x_heep_gen.pads.pad_ring import PadRing
 from x_heep_gen.pads.floorplan import Side
 from x_heep_gen.pads.pin import Input, Output, Inout
 
 
-def config() -> PadRing:
+def config(xheep: XHeep) -> PadRing:
     """
     Build and return the PadRing for the design, including pin definitions and pad mapping.
     For detailed documentation and usage instructions, please refer to docs/source/Configuration/PadConfiguration.md
@@ -64,6 +65,16 @@ def config() -> PadRing:
         Inout("spi2_sd_3"),
         Inout("i2c_scl"),
         Inout("i2c_sda"),
+        Input("ddr_rcv_clk"),
+        Output("ddr_snd_clk"),
+        Input("ddr_rcv_0"),
+        Input("ddr_rcv_1"),
+        Input("ddr_rcv_2"),
+        Input("ddr_rcv_3"),
+        Output("ddr_snd_0"),
+        Output("ddr_snd_1"),
+        Output("ddr_snd_2"),
+        Output("ddr_snd_3"),
     ]
 
     # Add all gpios at once
@@ -95,17 +106,19 @@ def config() -> PadRing:
             ["uart_rx"],
             ["uart_tx"],
             ["exit_valid"],
+            ["ddr_rcv_clk"],
+            ["ddr_snd_clk"],
             ["gpio_0"],
-            ["gpio_1"],
-            ["gpio_2"],
-            ["gpio_3"],
+            ["gpio_1", "ddr_rcv_0"],
+            ["gpio_2", "ddr_rcv_1"],
+            ["gpio_3", "ddr_rcv_2"],
             ["gpio_4"],
             ["gpio_5"],
-            ["gpio_6"],
-            ["gpio_7"],
-            ["gpio_8"],
-            ["gpio_9"],
-            ["gpio_10"],
+            ["gpio_6", "ddr_rcv_3"],
+            ["gpio_7", "ddr_snd_0"],
+            ["gpio_8", "ddr_snd_1"],
+            ["gpio_9", "ddr_snd_2"],
+            ["gpio_10", "ddr_snd_3"],
             ["gpio_11"],
             ["gpio_12"],
             ["gpio_13"],

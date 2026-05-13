@@ -126,7 +126,7 @@ BITSTREAM_SOURCE   	:= $(FUSESOC_BUILD_DIR)/$(FPGA_BOARD)-vivado/$(FUSESOC_BUILD
 HWH_SOURCE 			:= $(FUSESOC_BUILD_DIR)/$(FPGA_BOARD)-vivado/$(FUSESOC_BUILD_NAME).gen/sources_1/bd/xilinx_ps_wizard/hw_handoff/xilinx_ps_wizard.hwh 
 
 # Vendored IPs
-VENDOR_FILES	:= $(shell find hw/vendor sw/vendor -maxdepth 2 -type f -name "*.vendor.hjson" -print)
+VENDOR_FILES	:= $(shell find hw/vendor sw/vendor util -maxdepth 2 -type f -name "*.vendor.hjson" -print)
 VENDOR_LOCKS	:= $(subst .vendor.hjson,.lock.hjson,$(VENDOR_FILES))
 
 # Export variables to sub-makefiles
@@ -146,7 +146,7 @@ conda:
 ## @param X_HEEP_CFG=[configs/general.hjson(default),<path-to-config-file>]
 ## @param PYTHON_X_HEEP_CFG=[configs/general.py(default),<path-to-config-file>]
 mcu-gen:
-	$(PYTHON) util/mcu_gen.py --config $(X_HEEP_CFG) --python_config $(PYTHON_X_HEEP_CFG) --pads_cfg $(PADS_CFG) --outtpl "$(MCU_GEN_TEMPLATES)" --externaltpl "$(EXTERNAL_MCU_GEN_TEMPLATES)" --cpu $(CPU) --bus $(BUS) --memorybanks $(MEMORY_BANKS) --memorybanks_il $(MEMORY_BANKS_IL)
+	$(PYTHON) util/xheep_gen/mcu_gen.py --config $(X_HEEP_CFG) --python_config $(PYTHON_X_HEEP_CFG) --pads_cfg $(PADS_CFG) --outtpl "$(MCU_GEN_TEMPLATES)" --externaltpl "$(EXTERNAL_MCU_GEN_TEMPLATES)" --cpu $(CPU) --bus $(BUS) --memorybanks $(MEMORY_BANKS) --memorybanks_il $(MEMORY_BANKS_IL)
 	bash -c "cd hw/ip/soc_ctrl; source soc_ctrl_gen.sh; cd ../../../"
 	bash -c "cd hw/ip/power_manager; source power_manager_gen.sh; cd ../../../"
 	bash -c "cd hw/ip/pdm2pcm; source pdm2pcm_gen.sh; cd ../../../"
@@ -159,7 +159,7 @@ mcu-gen:
 
 ## Display mcu_gen.py help
 mcu-gen-help:
-	$(PYTHON) util/mcu_gen.py -h
+	$(PYTHON) util/xheep_gen/mcu_gen.py -h
 
 ## Runs verible formating
 verible: | .check-verible
@@ -167,9 +167,8 @@ verible: | .check-verible
 
 ## Runs black formating for python files
 format-python:
-	$(PYTHON) -m black util/x_heep_gen
+	$(PYTHON) -m black util/xheep_gen
 	$(PYTHON) -m black util/periph_structs_gen
-	$(PYTHON) -m black util/mcu_gen.py
 	$(PYTHON) -m black util/waiver-gen.py
 	$(PYTHON) -m black util/c_gen.py
 	$(PYTHON) -m black test/test_x_heep_gen

@@ -120,7 +120,6 @@ filesets:
 parameters:
   PS_ENABLE:
     datatype: bool
-    default: false
     paramtype: vlogdefine
 
 targets:

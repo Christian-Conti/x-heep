@@ -66,7 +66,7 @@ The Processing System (PS) enables remote access to the SoC over SSH. With the P
 Setting the `PS_ENABLE` argument instantiates the PS in the design for the supported boards:
 
 ```sh
-make vivado-fpga FPGA_BOARD=pynq-z2 FUSESOC_ARGS="--PS_ENABLE"
+make vivado-fpga FPGA_BOARD=pynq-z2 FUSESOC_PARAM="--PS_ENABLE"
 ```
 
 **Upload the bitstream to the remote board**
